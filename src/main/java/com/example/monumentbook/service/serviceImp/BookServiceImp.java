@@ -49,6 +49,7 @@ public class BookServiceImp implements BookService {
                 Optional<Author> author = authorRepository.findById(authorBook.getAuthors().getId());
                 if (author.isPresent()){
                     AuthorDto authorDto = new AuthorDto();
+
                         authorDto.setId(author.get().getId());
                         authorDto.setName(author.get().getName());
                         authorDto.setBiography(author.get().getBiography());

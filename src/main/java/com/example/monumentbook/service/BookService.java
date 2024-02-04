@@ -13,7 +13,6 @@ import java.util.List;
 public interface BookService {
     ResponseEntity<?> findAllBook();
 
-
     ResponseEntity<?> findBookById(Integer id);
 
     ResponseEntity<?> saveBook(BookRequest book);

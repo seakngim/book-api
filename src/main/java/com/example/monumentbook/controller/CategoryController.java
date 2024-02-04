@@ -7,19 +7,19 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("Api/v1/category")
+@RequestMapping("api/v1/category")
 public class CategoryController {
         private final CategoryService categoryService;
 
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
-    @GetMapping("/All")
+    @GetMapping("/all")
     public ResponseEntity<?> getAllCategory(){
         return categoryService.findAllCategory();
     }
     @PostMapping("/add")
-    public  ResponseEntity<?> AddCategory(CategoryRequest categoryRequest){
+    public  ResponseEntity<?> AddCategory(@RequestBody CategoryRequest categoryRequest){
         return categoryService.saveCategory(categoryRequest);
     }
 
