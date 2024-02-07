@@ -49,10 +49,9 @@ public class BookServiceImp implements BookService {
                 Optional<Author> author = authorRepository.findById(authorBook.getAuthors().getId());
                 if (author.isPresent()){
                     AuthorDto authorDto = new AuthorDto();
-
-                        authorDto.setId(author.get().getId());
                         authorDto.setName(author.get().getName());
-                        authorDto.setBiography(author.get().getBiography());
+                        authorDto.setDescription(author.get().getName());
+                        authorDto.setImage(author.get().getImage());
                     authorListName.add(authorDto);
                 }
             }
@@ -82,15 +81,15 @@ public class BookServiceImp implements BookService {
 
         if (book.isPresent()) {
             List<AuthorBook> authorBookList = authorBookRepository.findAllByBook(book.get());
-            List<AuthorDto> authorDtoList = new ArrayList<AuthorDto>();
+            List<AuthorDto> authorListName = new ArrayList<AuthorDto>();
             for(AuthorBook authorBook: authorBookList){
                 Optional<Author> author = authorRepository.findById(authorBook.getAuthors().getId());
                 if (author.isPresent()){
                     AuthorDto authorDto = new AuthorDto();
-                    authorDto.setId(author.get().getId());
                     authorDto.setName(author.get().getName());
-                    authorDto.setBiography(author.get().getBiography());
-                    authorDtoList.add(authorDto);
+                    authorDto.setDescription(author.get().getName());
+                    authorDto.setImage(author.get().getImage());
+                    authorListName.add(authorDto);
                 }
             }
             BookResponse bookResponse= BookResponse.builder()
@@ -101,7 +100,7 @@ public class BookServiceImp implements BookService {
                     .publisher(book.get().getPublisher())
                     .coverImg(book.get().getCoverImg())
                     .categories(book.get().getCategories().toDto())
-                    .author(authorDtoList)
+                    .author(authorListName)
                     .build();
             return ResponseEntity.ok(ApiResponse.<BookResponse>builder()
                     .message("Success: Book found with ID " + id)
@@ -127,8 +126,6 @@ public class BookServiceImp implements BookService {
             bookObj = Book.builder()
                     .title(book.getTitle())
                     .description(book.getDescription())
-                    .price(book.getPrice())
-                    .qty(book.getQty())
                     .publishDate(book.getPublisherDate())
                     .isbn(book.getIsbn())
                     .coverImg(book.getCoverImg())
@@ -155,9 +152,9 @@ public class BookServiceImp implements BookService {
             Optional<Author> author = authorRepository.findById(authorBook.getAuthors().getId());
             if (author.isPresent()){
                 AuthorDto authorDto = new AuthorDto();
-                authorDto.setId(author.get().getId());
                 authorDto.setName(author.get().getName());
-                authorDto.setBiography(author.get().getBiography());
+                authorDto.setDescription(author.get().getName());
+                authorDto.setImage(author.get().getImage());
                 authorListName.add(authorDto);
             }
         }
@@ -169,7 +166,6 @@ public class BookServiceImp implements BookService {
                 .price(bookObj.getPrice())
                 .qty(bookObj.getQty())
                 .publisher(bookObj.getPublisher())
-                .publishDate(bookObj.getPublishDate())
                 .coverImg(bookObj.getCoverImg())
                 .categories(bookObj.getCategories().toDto())
                 .author(authorListName)
@@ -181,134 +177,7 @@ public class BookServiceImp implements BookService {
                 .build());
     }
 
-    @Override
-    @Transactional
-    public ResponseEntity<?> updateBook(BookRequest book) {
 
-        Optional<Book> books = Optional.ofNullable(bookRepository.getByIsbn(book.getIsbn()));
-        if (books.isPresent()) {
-            List<AuthorBook> authorBookList = authorBookRepository.findAllByBook(books.get());
-            List<AuthorDto> authorDtoList = new ArrayList<AuthorDto>();
-            for (AuthorBook authorBook : authorBookList) {
-                Optional<Author> author = authorRepository.findById(authorBook.getAuthors().getId());
-                if (author.isPresent()) {
-                    AuthorDto authorDto = new AuthorDto();
-                    authorDto.setId(author.get().getId());
-                    authorDto.setName(author.get().getName());
-                    authorDto.setBiography(author.get().getBiography());
-                    authorDtoList.add(authorDto);
-                }
-            }
-
-            Optional<BookCategory> category = categoryRepository.findById(book.getCategoryId());
-            Book bookObj = null;
-            if (category.isPresent()) {
-                bookObj = Book.builder()
-                        .id(books.get().getId())
-                        .title(book.getTitle())
-                        .description(book.getDescription())
-                        .coverImg(book.getCoverImg())
-                        .price(book.getPrice())
-                        .qty(books.get().getQty()+ book.getQty())
-                        .isbn(book.getIsbn())
-                        .publishDate(book.getPublisherDate())
-                        .publisher(book.getPublisher())
-                        .categories(category.get())
-                        .build();
-            }
-           Book bookUpdate = bookRepository.save(bookObj);
-            BookResponse bookResponse= BookResponse.builder()
-                    .id(bookUpdate.getId())
-                    .title(bookUpdate.getTitle())
-                    .description(bookUpdate.getDescription())
-                    .price(bookUpdate.getPrice())
-                    .qty(bookUpdate.getQty())
-                    .publisher(bookUpdate.getPublisher())
-                    .publishDate(bookUpdate.getPublishDate())
-                    .isbn(book.getIsbn())
-                    .coverImg(bookUpdate.getCoverImg())
-                    .categories(bookUpdate.getCategories().toDto())
-                    .author(authorDtoList)
-                    .build();
-
-//            for (Integer author : book.getAuthorsId()) {
-//                Optional<Author> authors = authorRepository.findById(author);
-//                if (authors.isPresent()) {
-//                    AuthorBook authorBook = AuthorBook.builder()
-//                            .authors(authors.get())
-//                            .book(bookObj)
-//                            .build();
-//                    authorBookRepository.save(authorBook);
-//                }
-//            }
-
-
-            return ResponseEntity.ok(ApiResponse.<BookResponse>builder()
-                    .message("Success: Book update with ID " )
-                    .status(HttpStatus.OK)
-                    .payload(bookResponse)
-                    .build());
-        } else {
-
-            Optional<BookCategory> category = categoryRepository.findById(book.getCategoryId());
-            Book bookObj = null;
-            if (category.isPresent()) {
-                bookObj = Book.builder()
-                        .title(book.getTitle())
-                        .description(book.getDescription())
-                        .price(book.getPrice())
-                        .qty(book.getQty())
-                        .publishDate(book.getPublisherDate())
-                        .isbn(book.getIsbn())
-                        .coverImg(book.getCoverImg())
-                        .publisher(book.getPublisher())
-                        .categories(category.get())
-                        .build();
-            }
-            bookRepository.save(bookObj);
-            for(Integer author: book.getAuthorsId()){
-                Optional<Author> authors = authorRepository.findById(author);
-                if(authors.isPresent()){
-                    AuthorBook authorBook = AuthorBook.builder()
-                            .authors(authors.get())
-                            .book(bookObj)
-                            .build();
-                    authorBookRepository.save(authorBook);
-                }
-            }
-            List<AuthorBook> authorBookList = authorBookRepository.findAllByBook(bookObj);
-
-            List<AuthorDto> authorListName = new ArrayList<>();
-            for (AuthorBook authorBook : authorBookList){
-                Optional<Author> author = authorRepository.findById(authorBook.getAuthors().getId());
-                if (author.isPresent()){
-                    AuthorDto authorDto = new AuthorDto();
-                    authorDto.setId(author.get().getId());
-                    authorDto.setName(author.get().getName());
-                    authorDto.setBiography(author.get().getBiography());
-                    authorListName.add(authorDto);
-                }
-            }
-            BookResponse bookResponse= BookResponse.builder()
-                    .id(bookObj.getId())
-                    .title(bookObj.getTitle())
-                    .description(bookObj.getDescription())
-                    .price(bookObj.getPrice())
-                    .qty(bookObj.getQty())
-                    .publisher(bookObj.getPublisher())
-                    .isbn(bookObj.getIsbn())
-                    .publishDate(bookObj.getPublishDate())
-                    .coverImg(bookObj.getCoverImg())
-                    .categories(bookObj.getCategories().toDto())
-                    .author(authorListName)
-                    .build();
-            return ResponseEntity.ok(ApiResponse.<BookResponse>builder()
-                    .message("Success: Book update with ID " )
-                    .status(HttpStatus.OK)
-                    .payload(bookResponse)
-                    .build());
-        }
-    }
 
 
 }

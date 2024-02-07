@@ -5,6 +5,7 @@ import com.example.monumentbook.message.ResponseMessage;
 import com.example.monumentbook.model.File;
 import com.example.monumentbook.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -58,7 +59,7 @@ public class FileController {
     }
 
     @GetMapping("/files/{id}")
-    public ResponseEntity<byte[]> getFile(@PathVariable String id) {
+    public ResponseEntity<?> getFile(@Param("id") String id) {
         File fileDB = storageService.getFile(id);
 
         return ResponseEntity.ok()

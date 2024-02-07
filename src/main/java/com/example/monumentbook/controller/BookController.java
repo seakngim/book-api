@@ -29,11 +29,11 @@ public class BookController {
     public ResponseEntity<?> addBook(@RequestBody BookRequest book){
         return bookService.saveBook(book);
     }
-    @PostMapping("/addNewBook")
-    @Operation(summary = "Update book")
-    public ResponseEntity<?> updateBookById(@RequestBody BookRequest bookRequest){
-        return bookService.updateBook( bookRequest);
-    }
+//    @PostMapping("/addNewBook")
+//    @Operation(summary = "Update book")
+//    public ResponseEntity<?> updateBookById(@RequestBody BookRequest bookRequest){
+//        return bookService.updateBook(bookRequest);
+//    }
 
 
 }

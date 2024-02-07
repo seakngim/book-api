@@ -4,6 +4,7 @@ import com.example.monumentbook.model.dto.BookDto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -25,10 +26,11 @@ public class Book {
     private String isbn;
     private String publisher;
     private String coverImg;
-    private Date publishDate;
+    private LocalDate publishDate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private BookCategory categories;
+    private boolean delete;
 
     public BookDto toDto() {
         return new BookDto(this.id,

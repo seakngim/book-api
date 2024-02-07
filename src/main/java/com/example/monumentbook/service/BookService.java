@@ -12,9 +12,8 @@ import java.util.List;
 @Service
 public interface BookService {
     ResponseEntity<?> findAllBook();
-
     ResponseEntity<?> findBookById(Integer id);
 
     ResponseEntity<?> saveBook(BookRequest book);
-    ResponseEntity<?> updateBook(BookRequest book);
+//    ResponseEntity<?> updateBook(BookRequest book);
 }

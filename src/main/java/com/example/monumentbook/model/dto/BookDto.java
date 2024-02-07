@@ -4,6 +4,7 @@ import com.example.monumentbook.model.Author;
 import com.example.monumentbook.model.BookCategory;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,6 @@ public class BookDto {
     private int qty;
     private String isbn;
     private String publisher;
-    private Date publishDate;
+    private LocalDate publishDate;
     private BookCategoryDto categories;
 }

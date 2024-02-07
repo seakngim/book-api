@@ -9,11 +9,12 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class AuthorDto {
-    private Integer id;
-    private String name;
-    private String biography;
 
-    public AuthorDto(Integer id, String name, String biography) {
+public class AuthorDto {
+    private String name;
+    private String description;
+    private String image;
+
+    public AuthorDto(Integer id, String name, String description,String image) {
     }
 }
