@@ -19,11 +19,12 @@ public class FileService  {
     public File store(MultipartFile file) throws IOException {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         File files = new File();
-        files.setName(fileName);
-
+        files.setFileName(fileName);
+        files.setFileType(file.getContentType());
+        files.setFileData(file.getBytes());
+        System.out.println("file.getSize()"+file.getBytes().length);
         return fileRepository.save(files);
     }
-
     public File getFile(String id) {
         return fileRepository.findById(id).get();
     }

@@ -15,11 +15,11 @@ public class File {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
 
-    private String name;
+    private String fileName;
 
-    private String type;
+    private String fileType;
     @Lob
-    private byte[] data;
-
+    @Column(name = "file_data", columnDefinition = "BLOB")
+    private byte[] fileData;
 
 }

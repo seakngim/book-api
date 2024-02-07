@@ -18,17 +18,19 @@ import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("Api/v1/file")
+@RequestMapping("api/v1/file")
 public class FileController {
     @Autowired
     private FileService storageService;
 
     @PostMapping(value ="/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file) {
+
+
         String message = "";
         try {
+            System.out.println("file"+file.getOriginalFilename());
             storageService.store(file);
-
             message = "Uploaded the file successfully: " + file.getOriginalFilename();
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
         } catch (Exception e) {
@@ -45,12 +47,11 @@ public class FileController {
                     .path("/files/")
                     .path(dbFile.getId())
                     .toUriString();
-
             return new ResponseFile(
-                    dbFile.getName(),
+                    dbFile.getFileName(),
                     fileDownloadUri,
-                    dbFile.getType(),
-                    dbFile.getData().length);
+                    dbFile.getFileType(),
+                    dbFile.getFileData().length);
         }).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(files);
@@ -61,7 +62,7 @@ public class FileController {
         File fileDB = storageService.getFile(id);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDB.getName() + "\"")
-                .body(fileDB.getData());
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDB.getFileName() + "\"")
+                .body(fileDB.getFileData());
     }
 }
