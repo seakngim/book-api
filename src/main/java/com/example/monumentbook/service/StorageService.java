@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class StorageService {
@@ -23,7 +24,7 @@ public class StorageService {
     public ResponseEntity<?> uploadImage(MultipartFile file, HttpServletRequest request) throws IOException {
 
         ImageData imageData = repository.save(ImageData.builder()
-                .name(file.getOriginalFilename())
+                .name(UUID.randomUUID().toString())
                 .type(file.getContentType())
                 .imageData(ImageUtils.compressImage(file.getBytes())).build());
         if (imageData != null) {
