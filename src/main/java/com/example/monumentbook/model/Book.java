@@ -30,7 +30,7 @@ public class Book {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private BookCategory categories;
-    @Column(name = "delete", nullable = false, columnDefinition = "BIT default 0")
+    @Column(name = "`delete`", nullable = false)
     private boolean delete;
 
     public BookDto toDto() {
