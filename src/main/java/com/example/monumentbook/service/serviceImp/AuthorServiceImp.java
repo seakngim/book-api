@@ -62,7 +62,7 @@ public class AuthorServiceImp implements AuthorService {
                     Book book = Book.builder()
                             .id(bookOptional.get().getId())
                             .title(bookOptional.get().getTitle())
-                            .categories(bookOptional.get().getCategories())
+//                            .categories(bookOptional.get().getCategories())
                             .isbn(bookOptional.get().getIsbn())
                             .coverImg(bookOptional.get().getCoverImg())
                             .build();
@@ -104,7 +104,7 @@ public class AuthorServiceImp implements AuthorService {
                     Book book = Book.builder()
                             .id(bookOptional.get().getId())
                             .title(bookOptional.get().getTitle())
-                            .categories(bookOptional.get().getCategories())
+//                            .categories(bookOptional.get().getCategories())
                             .isbn(bookOptional.get().getIsbn())
                             .coverImg(bookOptional.get().getCoverImg())
                             .build();

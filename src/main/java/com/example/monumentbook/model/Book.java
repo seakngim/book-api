@@ -13,7 +13,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-@Table(name = "books")
+@Table(name = "_book")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,29 +21,23 @@ public class Book {
     private Integer id;
     private String title;
     private String description;
-    private double price;
-    private int qty;
     private String isbn;
     private String publisher;
     private String coverImg;
     private LocalDate publishDate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private BookCategory categories;
-    @Column(name = "`delete`", nullable = false)
-    private boolean delete;
+    private Boolean delete;
 
     public BookDto toDto() {
         return new BookDto(this.id,
                 this.title,
                 this.description,
                 this.coverImg,
-                this.price,
-                this.qty,
                 this.isbn,
                 this.publisher,
                 this.publishDate,
-                this.categories.toDto());
+                this.delete
+
+        );
     }
 
 }
