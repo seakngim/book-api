@@ -37,7 +37,8 @@ public class SecurityConfiguration {
                                         "/api/v1/auth/**",
                                         "/api/v1/file/**",
                                         "api/v1/book/*",
-                                        "api/v1/category/*"
+                                        "api/v1/category/*",
+                                        "/api/v1/image/**"
                                         )
                         .permitAll()
 //                         .requestMatchers(

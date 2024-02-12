@@ -1,6 +1,7 @@
 package com.example.monumentbook.controller;
 
 import com.example.monumentbook.service.StorageService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,10 +18,8 @@ public class ImageController {
     private StorageService service;
 
     @PostMapping(value ="/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) throws IOException {
-        String uploadImage = service.uploadImage(file);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(uploadImage);
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file, HttpServletRequest request) throws IOException {
+        return ResponseEntity.ok(service.uploadImage(file,request));
     }
 
     @GetMapping("/{fileName}")
