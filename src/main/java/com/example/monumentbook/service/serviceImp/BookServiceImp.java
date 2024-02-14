@@ -1,20 +1,17 @@
 package com.example.monumentbook.service.serviceImp;
 
-import com.example.monumentbook.model.Author;
-import com.example.monumentbook.model.AuthorBook;
-import com.example.monumentbook.model.Book;
-import com.example.monumentbook.model.BookCategory;
+import com.example.monumentbook.model.*;
 import com.example.monumentbook.model.dto.AuthorDto;
+import com.example.monumentbook.model.dto.CategoryDto;
 import com.example.monumentbook.model.requests.BookRequest;
-import com.example.monumentbook.model.responses.ApiResponse;
+import com.example.monumentbook.model.requests.ProductRequest;
 import com.example.monumentbook.model.responses.BookResponse;
-import com.example.monumentbook.repository.AuthorBookRepository;
-import com.example.monumentbook.repository.AuthorRepository;
-import com.example.monumentbook.repository.BookRepository;
-import com.example.monumentbook.repository.CategoryRepository;
+import com.example.monumentbook.repository.*;
 import com.example.monumentbook.service.BookService;
+import com.example.monumentbook.utilities.response.ResponseObject;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -28,110 +25,410 @@ public class BookServiceImp implements BookService {
  private final AuthorRepository authorRepository;
  private final CategoryRepository categoryRepository;
  private final AuthorBookRepository authorBookRepository;
+ private final BookCategoryRepository bookCategoryRepository;
 
-    public BookServiceImp(BookRepository bookRepository, AuthorRepository authorRepository, CategoryRepository categoryRepository, AuthorBookRepository authorBookRepository) {
+ ResponseObject res = new ResponseObject();
+
+    public BookServiceImp(BookRepository bookRepository, AuthorRepository authorRepository, CategoryRepository categoryRepository, AuthorBookRepository authorBookRepository, BookCategoryRepository bookCategoryRepository) {
 
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
         this.categoryRepository = categoryRepository;
         this.authorBookRepository = authorBookRepository;
+        this.bookCategoryRepository = bookCategoryRepository;
     }
-
 
     @Override
     public ResponseEntity<?> findAllBook() {
-//        List<Book> bookList = bookRepository.findAll();
-//        List<BookResponse> bookResponsesList = new ArrayList<>();
-//        for(Book book: bookList){
-//            List<AuthorBook> authorBookList = authorBookRepository.findAllByBook(book);
-//            List<AuthorDto> authorListName = new ArrayList<>();
-//            for (AuthorBook authorBook : authorBookList){
-//                Optional<Author> author = authorRepository.findById(authorBook.getAuthors().getId());
-//                if (author.isPresent()){
-//                    AuthorDto authorDto = new AuthorDto();
-//                        authorDto.setName(author.get().getName());
-//                        authorDto.setDescription(author.get().getName());
-//                        authorDto.setImage(author.get().getImage());
-//                    authorListName.add(authorDto);
-//                }
-//            }
-//            BookResponse bookResponse= BookResponse.builder()
-//                    .id(book.getId())
-//                    .title(book.getTitle())
-//                    .description(book.getDescription())
-//                    .publisher(book.getPublisher())
-//                    .coverImg(book.getCoverImg())
-//                    .categories(book.getCategories().toDto())
-//                    .author(authorListName)
-//                    .build();
-//            bookResponsesList.add(bookResponse);
-//        }
-//        return ResponseEntity.ok(ApiResponse.<List<BookResponse>>builder()
-//                .message("success fetch Book")
-//                .status(HttpStatus.OK)
-//                .payload(bookResponsesList)
-//                .build());
-        return null;
+        try {
+            List<BookResponse> bookObj = new ArrayList<>();
+            List<Book> bookList = bookRepository.findAll();
+            for (Book book: bookList){
+                Optional<Book> bookOptional = bookRepository.findById(book.getId());
+                if (bookOptional.isPresent() && !bookOptional.get().getDelete()){
+                    List<CategoryDto> categoryObj = new ArrayList<>();
+                    List<BookCategory> categoryByBook = bookCategoryRepository.findBookCategoryByBook(bookOptional.get());
+                    for (BookCategory bookCategory: categoryByBook){
+
+                        Optional<Category> categoryOptional = categoryRepository.findById(bookCategory.getCategory().getId());
+                        if (categoryOptional.isPresent()){
+                            CategoryDto categoryDto = CategoryDto.builder()
+                                    .id(categoryOptional.get().getId())
+                                    .name(categoryOptional.get().getName())
+                                    .description(categoryOptional.get().getDescription())
+                                    .build();
+                            categoryObj.add(categoryDto);
+                        }
+
+                    }
+                    List<AuthorDto> authorObj = new ArrayList<>();
+                    List<AuthorBook> categoryByAuthor = authorBookRepository.findAllByBook(bookOptional.get());
+                    for (AuthorBook authorBook :categoryByAuthor){
+                        Optional<Author> authorOptional = authorRepository.findById(authorBook.getAuthors().getId());
+                        if (authorOptional.isPresent()){
+                            AuthorDto authorDto = AuthorDto.builder()
+                                    .id(authorOptional.get().getId())
+                                    .name(authorOptional.get().getName())
+                                    .description(authorOptional.get().getDescription())
+                                    .image(authorOptional.get().getImage())
+                                    .build();
+                            authorObj.add(authorDto);
+                        }
+
+                    }
+                    BookResponse bookResponse = BookResponse.builder()
+                            .id(bookOptional.get().getId())
+                            .title(bookOptional.get().getTitle())
+                            .description(bookOptional.get().getDescription())
+                            .isbn(bookOptional.get().getIsbn())
+                            .coverImg(bookOptional.get().getCoverImg())
+                            .publisher(bookOptional.get().getPublisher())
+                            .publishDate(bookOptional.get().getPublishDate())
+                            .price(bookOptional.get().getPrice())
+                            .qty(bookOptional.get().getQty())
+                            .author(authorObj)
+                            .categories(categoryObj)
+                            .build();
+                    bookObj.add(bookResponse);
+
+                }
+            }
+            if (!bookObj.isEmpty()) {
+                res.setStatus(true);
+                res.setMessage("Fetch books successful!");
+                res.setData(bookObj);
+                return ResponseEntity.ok(res);
+            } else {
+                res.setStatus(false);
+                res.setMessage("No books found!");
+                res.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+            }
+
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @Override
     public ResponseEntity<?> findBookById(Integer id) {
-//        Optional<Book> book = bookRepository.findById(id);
-//
-//        if (book.isPresent()) {
-//            List<AuthorBook> authorBookList = authorBookRepository.findAllByBook(book.get());
-//            List<AuthorDto> authorListName = new ArrayList<AuthorDto>();
-//            for(AuthorBook authorBook: authorBookList){
-//                Optional<Author> author = authorRepository.findById(authorBook.getAuthors().getId());
-//                if (author.isPresent()){
-//                    AuthorDto authorDto = new AuthorDto();
-//                    authorDto.setName(author.get().getName());
-//                    authorDto.setDescription(author.get().getName());
-//                    authorDto.setImage(author.get().getImage());
-//                    authorListName.add(authorDto);
-//                }
-//            }
-//            BookResponse bookResponse= BookResponse.builder()
-//                    .id(book.get().getId())
-//                    .title(book.get().getTitle())
-//                    .description(book.get().getDescription())
-//                    .publisher(book.get().getPublisher())
-//                    .coverImg(book.get().getCoverImg())
-//                    .categories(book.get().getCategories().toDto())
-//                    .author(authorListName)
-//                    .build();
-//            return ResponseEntity.ok(ApiResponse.<BookResponse>builder()
-//                    .message("Success: Book found with ID " + id)
-//                    .status(HttpStatus.OK)
-//                    .payload(bookResponse)
-//                    .build());
-//        } else {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(ApiResponse.<Book>builder()
-//                            .message("Fail: Book not found with ID " + id)
-//                            .status(HttpStatus.NOT_FOUND)
-//                            .build());
-//        }
-        return null;
+        try {
+            List<BookResponse> bookObj = new ArrayList<>();
+            Optional<Book> bookOptional = bookRepository.findById(id);
+            if (bookOptional.isPresent()){
+                List<CategoryDto> categoryObj = new ArrayList<>();
+                List<BookCategory> categoryByBook = bookCategoryRepository.findBookCategoryByBook(bookOptional.get());
+                for (BookCategory bookCategory: categoryByBook){
+
+                    Optional<Category> categoryOptional = categoryRepository.findById(bookCategory.getCategory().getId());
+                    if (categoryOptional.isPresent()){
+                        CategoryDto categoryDto = CategoryDto.builder()
+                                .id(categoryOptional.get().getId())
+                                .name(categoryOptional.get().getName())
+                                .description(categoryOptional.get().getDescription())
+                                .build();
+                        categoryObj.add(categoryDto);
+                    }
+
+                }
+                List<AuthorDto> authorObj = new ArrayList<>();
+                List<AuthorBook> categoryByAuthor = authorBookRepository.findAllByBook(bookOptional.get());
+                for (AuthorBook authorBook :categoryByAuthor){
+                    Optional<Author> authorOptional = authorRepository.findById(authorBook.getAuthors().getId());
+                    if (authorOptional.isPresent()){
+                        AuthorDto authorDto = AuthorDto.builder()
+                                .id(authorOptional.get().getId())
+                                .name(authorOptional.get().getName())
+                                .description(authorOptional.get().getDescription())
+                                .image(authorOptional.get().getImage())
+                                .build();
+                        authorObj.add(authorDto);
+                    }
+
+                }
+                BookResponse bookResponse = BookResponse.builder()
+                        .id(bookOptional.get().getId())
+                        .title(bookOptional.get().getTitle())
+                        .description(bookOptional.get().getDescription())
+                        .isbn(bookOptional.get().getIsbn())
+                        .coverImg(bookOptional.get().getCoverImg())
+                        .publisher(bookOptional.get().getPublisher())
+                        .publishDate(bookOptional.get().getPublishDate())
+                        .price(bookOptional.get().getPrice())
+                        .qty(bookOptional.get().getQty())
+                        .author(authorObj)
+                        .categories(categoryObj)
+                        .build();
+                bookObj.add(bookResponse);
+                res.setStatus(true);
+                res.setMessage("fetch book successful!");
+                res.setData(bookObj);
+                return ResponseEntity.ok(res);
+            }else {
+                res.setStatus(false);
+                res.setMessage("Book not found!");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+            }
+
+        }catch (Exception e){
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+
     }
 
     @Override
     @Transactional
     public ResponseEntity<?> saveBook(BookRequest bookRequest) {
-        Book book = Book.builder()
-                .isbn(bookRequest.getIsbn())
-                .title(bookRequest.getTitle())
-                .description(bookRequest.getDescription())
-                .coverImg(bookRequest.getCoverImg())
-                .publishDate(bookRequest.getPublisherDate())
-                .delete(false)
-                .build();
-        bookRepository.save(book);
-        return ResponseEntity.ok(book);
+        try {
+            Book book = Book.builder()
+                    .isbn(bookRequest.getIsbn())
+                    .title(bookRequest.getTitle())
+                    .description(bookRequest.getDescription())
+                    .coverImg(bookRequest.getCoverImg())
+                    .publisher(bookRequest.getPublisher())
+                    .publishDate(bookRequest.getPublishDate())
+                    .delete(false)
+                    .build();
+            bookRepository.save(book);
+            List<AuthorBook> authorBookList = new ArrayList<>();
+            for (Integer author : bookRequest.getAuthorId()){
+                Optional<Author> authorOptional = authorRepository.findById(author);
+                if (authorOptional.isPresent()) {
+                    AuthorBook authorBook = AuthorBook.builder()
+                            .authors(authorOptional.get())
+                            .book(book)
+                            .build();
+                    authorBookList.add(authorBook);
+                }
+            }
+            List<BookCategory> bookCategoryList = new ArrayList<>();
+            for (Integer category : bookRequest.getCategoryId()){
+                Optional<Category> categoryOptional = categoryRepository.findById(category);
+                if (categoryOptional.isPresent()){
+                    BookCategory bookCategory = BookCategory.builder()
+                            .book(book)
+                            .category(categoryOptional.get())
+                            .build();
+                    bookCategoryList.add(bookCategory);
+                }
+            }
+            bookCategoryRepository.saveAll(bookCategoryList);
+            authorBookRepository.saveAll(authorBookList);
+            List<CategoryDto> categories = new ArrayList<>();
+            for (Integer category: bookRequest.getCategoryId()){
+                Optional<Category> categoryOptional = categoryRepository.findById(category);
+                    if (categoryOptional.isPresent()){
+                        CategoryDto categoryDto = CategoryDto.builder()
+                                .id(category)
+                                .description(categoryOptional.get().getDescription())
+                                .name(categoryOptional.get().getName())
+                                .build();
+                        categories.add(categoryDto);
+                    }
+
+
+            }
+            List<AuthorDto> authorDtos = new ArrayList<>();
+            for (Integer author: bookRequest.getAuthorId()){
+                Optional<Author> authorOptional = authorRepository.findById(author);
+                if (authorOptional.isPresent()){
+                    AuthorDto authorDto = AuthorDto.builder()
+                            .id(authorOptional.get().getId())
+                            .name(authorOptional.get().getName())
+                            .description(authorOptional.get().getDescription())
+                            .image(authorOptional.get().getImage())
+                            .build();
+                    authorDtos.add(authorDto);
+                }
+            }
+            BookResponse bookResponse = BookResponse.builder()
+                    .id(book.getId())
+                    .title(book.getTitle())
+                    .description(book.getDescription())
+                    .isbn(book.getIsbn())
+                    .coverImg(book.getCoverImg())
+                    .publisher(book.getPublisher())
+                    .publishDate(book.getPublishDate())
+                    .author(authorDtos)
+                    .categories(categories)
+                    .build();
+            res.setMessage("book add success!");
+            res.setData(bookResponse);
+            res.setStatus(true);
+            return ResponseEntity.ok(res);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
 
     }
 
+    @Override
+    public ResponseEntity<?> updateBook(BookRequest bookRequest, Integer id) {
+        try {
+            Optional<Book> bookOptional = bookRepository.findById(id);
+            if (bookOptional.isPresent()){
+                Book book = Book.builder()
+                        .id(id)
+                        .isbn(bookRequest.getIsbn())
+                        .title(bookRequest.getTitle())
+                        .description(bookRequest.getDescription())
+                        .coverImg(bookRequest.getCoverImg())
+                        .publisher(bookRequest.getPublisher())
+                        .publishDate(bookRequest.getPublishDate())
+                        .delete(false)
+                        .build();
+                bookRepository.save(book);
+                List<AuthorBook> authorBookList = new ArrayList<>();
+                for (Integer author : bookRequest.getAuthorId()){
+                    Optional<Author> authorOptional = authorRepository.findById(author);
+                    List<AuthorBook> authorBooks = authorBookRepository.findAllByBook(book);
+                    for(AuthorBook authorBook : authorBooks){
+                        authorBookRepository.deleteById(authorBook.getId());
+                    }
+                    if (authorOptional.isPresent()) {
+                        AuthorBook authorBook = AuthorBook.builder()
+                                .authors(authorOptional.get())
+                                .book(book)
+                                .build();
+                        authorBookList.add(authorBook);
 
+                    }
+                    authorBookRepository.deleteById(author);
+                }
+                List<BookCategory> bookCategoryList = new ArrayList<>();
+                for (Integer category : bookRequest.getCategoryId()){
+                    Optional<Category> categoryOptional = categoryRepository.findById(category);
+                    List<BookCategory> bookCategoryList1 = bookCategoryRepository.findBookCategoryByBook(book);
+                    for (BookCategory bookCategory : bookCategoryList1){
+                        bookCategoryRepository.deleteById(bookCategory.getId());
+                    }
+                    if (categoryOptional.isPresent()){
+                        BookCategory bookCategory = BookCategory.builder()
+                                .book(book)
+                                .category(categoryOptional.get())
+                                .build();
+                        bookCategoryList.add(bookCategory);
+
+                    }
+
+                }
+                bookCategoryRepository.saveAll(bookCategoryList);
+                authorBookRepository.saveAll(authorBookList);
+                List<CategoryDto> categories = new ArrayList<>();
+                for (Integer category: bookRequest.getCategoryId()){
+                    Optional<Category> categoryOptional = categoryRepository.findById(category);
+                    if (categoryOptional.isPresent()){
+                        CategoryDto categoryDto = CategoryDto.builder()
+                                .id(category)
+                                .description(categoryOptional.get().getDescription())
+                                .name(categoryOptional.get().getName())
+                                .build();
+                        categories.add(categoryDto);
+                    }
+                }
+                List<AuthorDto> authorDtos = new ArrayList<>();
+                for (Integer author: bookRequest.getAuthorId()){
+                    Optional<Author> authorOptional = authorRepository.findById(author);
+                    if (authorOptional.isPresent()){
+                        AuthorDto authorDto = AuthorDto.builder()
+                                .id(authorOptional.get().getId())
+                                .name(authorOptional.get().getName())
+                                .description(authorOptional.get().getDescription())
+                                .image(authorOptional.get().getImage())
+                                .build();
+                        authorDtos.add(authorDto);
+                    }
+                }
+                BookResponse bookResponse = BookResponse.builder()
+                        .id(book.getId())
+                        .title(book.getTitle())
+                        .description(book.getDescription())
+                        .isbn(book.getIsbn())
+                        .coverImg(book.getCoverImg())
+                        .publisher(book.getPublisher())
+                        .publishDate(book.getPublishDate())
+                        .author(authorDtos)
+                        .categories(categories)
+                        .build();
+                res.setStatus(true);
+                res.setMessage("update success!" + " id" +id);
+                res.setData(bookResponse);
+               return ResponseEntity.ok(res);
+            }else {
+                res.setStatus(false);
+                res.setMessage("update false!" +" id" + id);
+                res.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> DeleteById(Integer id) {
+        try {
+            Optional<Book> bookOptional = bookRepository.findById(id);
+            if (bookOptional.isPresent() && !bookOptional.get().getDelete()){
+                Book book = Book.builder()
+                        .id(id)
+                        .isbn(bookOptional.get().getIsbn())
+                        .title(bookOptional.get().getTitle())
+                        .description(bookOptional.get().getDescription())
+                        .coverImg(bookOptional.get().getCoverImg())
+                        .publisher(bookOptional.get().getPublisher())
+                        .publishDate(bookOptional.get().getPublishDate())
+                        .delete(true)
+                        .build();
+                bookRepository.save(book);
+                res.setStatus(true);
+                res.setMessage("delete success!" + " id" +id);
+                res.setData(null);
+                return ResponseEntity.ok(res);
+            }else {
+                res.setStatus(false);
+                res.setMessage("delete false!" +" id" + id);
+                res.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> addProductByName(Integer id, ProductRequest productRequest) {
+
+        try {
+            Optional<Book> bookOptional = bookRepository.findById(id);
+            if (bookOptional.isPresent() && !bookOptional.get().getDelete()){
+                Book book = Book.builder()
+                        .id(bookOptional.get().getId())
+                        .isbn(bookOptional.get().getIsbn())
+                        .title(bookOptional.get().getTitle())
+                        .description(bookOptional.get().getDescription())
+                        .coverImg(bookOptional.get().getCoverImg())
+                        .publisher(bookOptional.get().getPublisher())
+                        .publishDate(bookOptional.get().getPublishDate())
+                        .price(productRequest.getPrice() + bookOptional.get().getPrice())
+                        .qty(productRequest.getQty() + bookOptional.get().getQty())
+                        .delete(false)
+                        .build();
+                bookRepository.save(book);
+                res.setStatus(true);
+                res.setMessage("add success!");
+                res.setData(null);
+                return ResponseEntity.ok(res);
+            }else {
+                res.setStatus(false);
+                res.setMessage("add false!" );
+                res.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
 
 }

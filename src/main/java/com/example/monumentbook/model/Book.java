@@ -21,10 +21,15 @@ public class Book {
     private Integer id;
     private String title;
     private String description;
+    @Column(unique = true)
     private String isbn;
     private String publisher;
     private String coverImg;
     private LocalDate publishDate;
+    private int qty;
+    private int price;
+    private String vedor;
+    @Column(name = "`delete`")
     private Boolean delete;
 
     public BookDto toDto() {

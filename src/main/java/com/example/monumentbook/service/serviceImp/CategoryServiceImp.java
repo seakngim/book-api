@@ -2,6 +2,7 @@ package com.example.monumentbook.service.serviceImp;
 
 import com.example.monumentbook.model.Book;
 import com.example.monumentbook.model.BookCategory;
+import com.example.monumentbook.model.Category;
 import com.example.monumentbook.model.requests.CategoryRequest;
 import com.example.monumentbook.model.responses.ApiResponse;
 import com.example.monumentbook.model.responses.CategoryResponse;
@@ -25,9 +26,9 @@ public class CategoryServiceImp implements CategoryService {
     @Override
     public ResponseEntity<?> findAllCategory() {
         try {
-            List<BookCategory> bookCategories = categoryRepository.findAll();
+            List<Category> bookCategories = categoryRepository.findAll();
             List<CategoryResponse> categoryResponseList = new ArrayList<>();
-            for(BookCategory bookCategory : bookCategories){
+            for(Category bookCategory : bookCategories){
                 CategoryResponse categoryResponse = CategoryResponse.builder()
                         .id(bookCategory.getId())
                         .name(bookCategory.getName())
@@ -53,18 +54,24 @@ public class CategoryServiceImp implements CategoryService {
 
     @Override
     public ResponseEntity<?> saveCategory(CategoryRequest category) {
-        BookCategory categoryObj = null;
-        categoryObj =  BookCategory.builder()
-                .name(category.getName())
-                .description(category.getDescription())
-                .build();
-        categoryRepository.save(categoryObj);
+        try {
+            Category categoryObj = null;
+            categoryObj =  Category.builder()
+                    .name(category.getName())
+                    .description(category.getDescription())
+                    .build();
+            categoryRepository.save(categoryObj);
+            return ResponseEntity.ok(ApiResponse.<CategoryResponse>builder()
+                    .message("susses")
+                    .status(HttpStatus.OK)
 
-        return ResponseEntity.ok(ApiResponse.<CategoryResponse>builder()
-                        .message("susses")
-                        .status(HttpStatus.OK)
+                    .build());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("add category unsuccessful");
+        }
 
-                .build());
+
+
     }
 
 

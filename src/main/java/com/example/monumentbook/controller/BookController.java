@@ -1,8 +1,10 @@
 package com.example.monumentbook.controller;
 
 import com.example.monumentbook.model.requests.BookRequest;
+import com.example.monumentbook.model.requests.ProductRequest;
 import com.example.monumentbook.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,11 +31,22 @@ public class BookController {
     public ResponseEntity<?> addBook(@RequestBody BookRequest book){
         return bookService.saveBook(book);
     }
-//    @PostMapping("/addNewBook")
-//    @Operation(summary = "Update book")
-//    public ResponseEntity<?> updateBookById(@RequestBody BookRequest bookRequest){
-//        return bookService.updateBook(bookRequest);
-//    }
 
+    @PutMapping("update/{id}")
+    @Operation(summary = "Update book")
+    public ResponseEntity<?> updateBookById(@Param("book id") Integer id,@RequestBody BookRequest bookRequest){
+        return bookService.updateBook(bookRequest,id);
+    }
+    @DeleteMapping("/deleteById/{id}")
+    @Operation(summary = "delete book")
+    public  ResponseEntity<?> deleteBookById(@Param("book id") Integer id){
+        return  bookService.DeleteById(id);
+    }
+
+    @PostMapping("/addProductByName")
+    @Operation(summary = "add product by name")
+    public ResponseEntity<?> addProductByName(@Param("book id") Integer id, @RequestBody ProductRequest productRequest){
+      return bookService.addProductByName(id,productRequest);
+    }
 
 }

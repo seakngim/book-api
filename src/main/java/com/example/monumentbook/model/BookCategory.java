@@ -1,29 +1,27 @@
 package com.example.monumentbook.model;
 
-import com.example.monumentbook.model.dto.BookCategoryDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.List;
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Builder
-@Table(name = "category")
+@Table(name = "_category_book")
 public class BookCategory {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id")
+    @Column(name = "id")
     private Integer id;
-    private String name;
-    private String description;
 
-    public BookCategoryDto toDto(){
-        return  new BookCategoryDto(this.id,this.name, this.description);
-    }
+    @ManyToOne(fetch = FetchType.LAZY )
+    @JoinColumn(name = "categoryId")
+    private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bookId")
+    private Book book;
 }

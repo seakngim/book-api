@@ -7,8 +7,9 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BookCategoryDto {
+@Builder
+public class CategoryDto {
     private Integer id;
-    private String categoryName;
-    private String Description;
+    private String name;
+    private String description;
 }

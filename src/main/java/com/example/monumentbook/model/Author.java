@@ -26,7 +26,7 @@ public class Author {
     private boolean delete = false;
 
 public AuthorDto toDto(){
-    return new AuthorDto(this.id, this.name,this.description,this.image);
+    return new AuthorDto(this.id, this.name, this.description, this.image);
 }
 
 }

@@ -19,7 +19,7 @@ public class BookRequest {
     private String coverImg;
     private String isbn;
     private String publisher;
-    private LocalDate publisherDate;
+    private LocalDate publishDate;
     private List<Integer> categoryId;
     private List<Integer> authorId;
 }

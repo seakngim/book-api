@@ -7,14 +7,14 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-
+@Builder
 public class AuthorDto {
+    private Integer id;
     private String name;
     private String description;
     private String image;
 
-    public AuthorDto(Integer id, String name, String description,String image) {
-    }
 }
