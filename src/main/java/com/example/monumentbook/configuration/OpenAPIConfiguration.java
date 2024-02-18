@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 //                        name = "boeun mno",
 //                        email = "boeurnmnor@gmil.com"
                 ),
-                title = "Leaving Management System",
+                title = "MonumentBook System",
                 version = "1.0",
                 description = "test api report system",
                 license = @License(

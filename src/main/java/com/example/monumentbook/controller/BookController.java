@@ -4,6 +4,7 @@ import com.example.monumentbook.model.requests.BookRequest;
 import com.example.monumentbook.model.requests.ProductRequest;
 import com.example.monumentbook.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("api/v1/book")
-//@SecurityRequirement(name = "bearerAuth")
+@SecurityRequirement(name = "bearerAuth")
 public class BookController {
     private final BookService bookService;
 
@@ -43,10 +44,23 @@ public class BookController {
         return  bookService.DeleteById(id);
     }
 
-    @PostMapping("/addProductByName")
-    @Operation(summary = "add product by name")
+    @PostMapping("/addProductById")
+    @Operation(summary = "add product by Id")
     public ResponseEntity<?> addProductByName(@Param("book id") Integer id, @RequestBody ProductRequest productRequest){
-      return bookService.addProductByName(id,productRequest);
+      return bookService.addProductById(id,productRequest);
     }
+    @PostMapping("/outProduct")
+    private ResponseEntity<?> outProduct(@Param("book id") Integer id, @RequestBody ProductRequest productRequest){
+        return  bookService.outProductById(id,productRequest);
+    }
+    @PostMapping("/add_book_of_the_week")
+    private ResponseEntity<?> addBookOfTheWeek(Integer id){
+        return bookService.addBookOfTheWeek(id);
+    }
+    @PostMapping("/get_book_of_the_week")
+    private ResponseEntity<?> getBookOfTheWeek(){
+        return bookService.getBookOfTheWeek();
+    }
+
 
 }

@@ -28,9 +28,10 @@ public class Book {
     private LocalDate publishDate;
     private int qty;
     private int price;
-    private String vedor;
     @Column(name = "`delete`")
-    private Boolean delete;
+    private boolean delete;
+    @Column(name = "of_the_week")
+    private boolean ofTheWeek;
 
     public BookDto toDto() {
         return new BookDto(this.id,

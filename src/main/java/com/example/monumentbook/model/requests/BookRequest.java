@@ -20,6 +20,7 @@ public class BookRequest {
     private String isbn;
     private String publisher;
     private LocalDate publishDate;
+    private int price;
     private List<Integer> categoryId;
     private List<Integer> authorId;
 }

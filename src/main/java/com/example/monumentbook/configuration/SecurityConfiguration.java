@@ -30,22 +30,20 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/*",
+                        request.requestMatchers("/",
                                         "/v3/api-docs/**",
                                         "/swagger-ui/**",
                                         "/swagger-ui-html",
                                         "/api/v1/auth/**",
                                         "/api/v1/file/**",
-                                        "api/v1/book/**",
                                         "api/v1/category/*",
                                         "api/v1/image/**",
                                         "api/v1/author/**"
                                         )
                         .permitAll()
-//                         .requestMatchers(
-//                                 ).hasAnyAuthority(Role.USER.toString(),Role.ADMIN.toString())
-                        .anyRequest()
-                        .authenticated())
+                                .requestMatchers("/api/v1/book/*").hasAnyAuthority(Role.USER.toString(),Role.ADMIN.toString())
+                                .anyRequest()
+                                .authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
