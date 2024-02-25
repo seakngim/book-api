@@ -7,6 +7,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BookDto {
     private Integer id;
     private String title;
@@ -15,5 +16,4 @@ public class BookDto {
     private String isbn;
     private String publisher;
     private LocalDate publishDate;
-    private boolean delete;
 }

@@ -38,15 +38,15 @@ public class CategoryServiceImp implements CategoryService {
             }
             return ResponseEntity.ok(ApiResponse.<List<CategoryResponse>>builder()
                     .message("Category fetch success")
-                    .status(HttpStatus.OK)
-                    .payload(categoryResponseList)
+                    .status(true)
+                    .data(categoryResponseList)
                     .build());
         }
         catch (Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.<BookCategory>builder()
                             .message("Fail: Category not found")
-                            .status(HttpStatus.NOT_FOUND)
+                            .status(false)
                             .build());
         }
 
@@ -63,7 +63,7 @@ public class CategoryServiceImp implements CategoryService {
             categoryRepository.save(categoryObj);
             return ResponseEntity.ok(ApiResponse.<CategoryResponse>builder()
                     .message("susses")
-                    .status(HttpStatus.OK)
+                    .status(true)
 
                     .build());
         }catch (Exception e){

@@ -3,6 +3,8 @@ package com.example.monumentbook.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -16,4 +18,5 @@ public class Vendor {
     private int price;
     private int qty;
     private String name;
+    private LocalDate date;
 }

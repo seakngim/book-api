@@ -28,21 +28,23 @@ public class Book {
     private LocalDate publishDate;
     private int qty;
     private int price;
-    @Column(name = "`delete`")
+    @Column(name = "is_delete")
     private boolean delete;
     @Column(name = "of_the_week")
     private boolean ofTheWeek;
-
+    @Column(name = "best_sell")
+    private boolean bestSell;
+    @Column(name = "new_arrival")
+    private boolean newArrival;
     public BookDto toDto() {
-        return new BookDto(this.id,
+        return new BookDto(
+                this.id,
                 this.title,
                 this.description,
                 this.coverImg,
                 this.isbn,
                 this.publisher,
-                this.publishDate,
-                this.delete
-
+                this.publishDate
         );
     }
 

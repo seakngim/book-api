@@ -15,10 +15,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "_user")
 public class User implements UserDetails {
 
@@ -26,8 +26,9 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-    private String firstName;
-    private String lastName;
+    private String username;
+    private String phoneNumber;
+    private String coverImg;
     @Column(unique = true)
     private String email;
     private String password;
@@ -68,6 +69,6 @@ public class User implements UserDetails {
         return true;
     }
     public UserDto toDto(){
-       return new UserDto(this.id,this.firstName,this.lastName,this.email);
+       return new UserDto(this.id,this.username,this.phoneNumber,this.email, this.coverImg);
     }
 }

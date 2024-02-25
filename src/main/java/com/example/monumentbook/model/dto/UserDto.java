@@ -5,12 +5,11 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Builder
 public class UserDto {
     private long id;
-    private String firstName;
-    private String lastName;
+    private String username;
+    private String phoneNumber;
     private String email;
-
+    private String coverImage;
 }

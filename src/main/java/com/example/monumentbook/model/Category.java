@@ -20,6 +20,8 @@ public class Category {
     private Integer id;
     private String name;
     private String description;
+    @Column(name = "delete")
+    private boolean delete;
 
     public CategoryDto toDto(){
         return  new CategoryDto(this.id,this.name, this.description);

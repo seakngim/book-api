@@ -22,8 +22,9 @@ public class Author {
     private String description;
     private String image;
     private LocalDate date;
-    @Column(name = "is_deleted")
+    @Column(name = "deleted")
     private boolean delete = false;
+    private boolean status;
 
 public AuthorDto toDto(){
     return new AuthorDto(this.id, this.name, this.description, this.image);

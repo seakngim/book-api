@@ -30,19 +30,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     EmptyObject emptyObject = new EmptyObject();
     Message message = new Message();
     @Override
-    public JwtAuthenticationResponse signup(SignUpRequest request) {
-        var user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
+    public ResponseEntity<?> signup(SignUpRequest request) {
+        try {
+        var user = User.builder().username(request.getUsername()).phoneNumber(request.getPhoneNumber())
                 .email(request.getEmail()).password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.valueOf(request.getRole().toUpperCase())).build();
         userRepository.save(user);
         var jwt = jwtService.generateToken(user);
-        return JwtAuthenticationResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .role(user.getRole().name())
-                .token(jwt).build();
+            JwtAuthenticationResponse response = JwtAuthenticationResponse.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .username(user.getUsername())
+                    .phoneNumber(user.getPhoneNumber())
+                    .role(user.getRole().name())
+                    .token(jwt).build();
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Handle generic signup failure
+            emptyObject.setStatus(false);
+            emptyObject.setMessage("Create account fail");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptyObject);
+        }
     }
     @Override
     public  ResponseEntity<?> signin(SigninRequest request) {
@@ -58,8 +67,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return ResponseEntity.ok(JwtAuthenticationResponse.builder()
                     .id(user.getId())
                     .email(user.getEmail())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
+                    .username(user.getUsername())
+                    .phoneNumber(user.getUsername())
                     .role(user.getRole().name())
                     .token(jwt).build());
         } catch (AuthenticationException e) {

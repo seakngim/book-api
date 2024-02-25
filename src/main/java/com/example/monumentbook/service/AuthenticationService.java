@@ -6,7 +6,7 @@ import com.example.monumentbook.model.responses.JwtAuthenticationResponse;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthenticationService {
-    JwtAuthenticationResponse signup(SignUpRequest request);
+    ResponseEntity<?> signup(SignUpRequest request);
 
     ResponseEntity<?> signin(SigninRequest request);
 

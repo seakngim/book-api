@@ -6,13 +6,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ApiResponse <T>{
+    private boolean status;
     private String message;
-    private HttpStatus status;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private T payload;
-}
+    private List<?> data;
+    private int page;
+    private int size;
+    private int totalPages;
+    private long totalElements;}
+
