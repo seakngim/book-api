@@ -41,5 +41,10 @@ public class CartController {
     public ResponseEntity<?> update(@Param("CART ID INTEGER")Integer id,@RequestBody CartRequest cartRequest){
         return cartService.updateCartById(id,cartRequest);
     }
+    @GetMapping("/byCurrentUser")
+    @Operation(summary = "get all cart")
+    public ResponseEntity<?> getAllCurrentUser(@RequestParam(defaultValue = "1") Integer page,@RequestParam(defaultValue = "10") Integer size){
+        return cartService.findCartByUser(page, size);
+    }
 
 }
