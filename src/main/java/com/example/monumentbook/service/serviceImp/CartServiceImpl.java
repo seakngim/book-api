@@ -118,8 +118,6 @@ public class CartServiceImpl implements CartService {
             return ResponseEntity.ok(res);
         }
     }
-
-
     @Override
     public ResponseEntity<?> getCartById(Integer id) {
         ResponseObject res= new ResponseObject();
