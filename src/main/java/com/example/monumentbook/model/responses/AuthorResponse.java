@@ -1,6 +1,7 @@
 package com.example.monumentbook.model.responses;
 
 import com.example.monumentbook.model.Book;
+import com.example.monumentbook.model.dto.BookDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
@@ -19,5 +20,5 @@ public class AuthorResponse {
     private String image;
     private LocalDate date;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<Book> book;
+    private List<BookDto> book;
 }

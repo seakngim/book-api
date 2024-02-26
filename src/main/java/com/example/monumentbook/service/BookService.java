@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface BookService {
     ResponseEntity<?> findAllBook(Integer page, Integer size);
     ResponseEntity<?> findBookById(Integer id);

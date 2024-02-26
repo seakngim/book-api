@@ -590,8 +590,6 @@ public class BookServiceImp implements BookService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
-
 //    fuction update and update
 public ResponseEntity<?> BookFlags(RequestById requestById, boolean ofTheWeekFlag, boolean bestSellFlag, boolean newArrivalFlag) {
     try {
@@ -675,11 +673,9 @@ public ResponseEntity<?> BookFlags(RequestById requestById, boolean ofTheWeekFla
                 categoryObj.add(categoryDto);
             });
         }
-
         return categoryObj;
     }
 //    fun get Author
-
     private List<AuthorDto> getAuthorsByBookId(Book bookId) {
         List<AuthorDto> authorObj = new ArrayList<>();
         List<AuthorBook> categoryByBook = authorBookRepository.findAllByBook(bookId);

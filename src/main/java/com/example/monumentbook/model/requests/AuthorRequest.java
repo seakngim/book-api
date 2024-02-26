@@ -13,6 +13,5 @@ import java.time.LocalDate;
 public class AuthorRequest {
     private String name;
     private String description;
-    private LocalDate date;
     private String image;
 }

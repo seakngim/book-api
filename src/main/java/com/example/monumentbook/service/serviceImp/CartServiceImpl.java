@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,7 @@ public class CartServiceImpl implements CartService {
                 Cart cart = Cart.builder()
                         .userId(user.get())
                         .bookId(book.get())
+                        .date(LocalDate.now())
                         .build();
                 cartRepository.save(cart);
                 BookDto bookObj = buildBookDto(book.get());
@@ -52,7 +54,6 @@ public class CartServiceImpl implements CartService {
                         .user(userObj)
                         .book(bookObj)
                         .build();
-
                 res.setMessage("add successful!");
                 res.setStatus(true);
                 res.setData(cartResponse);
@@ -71,18 +72,15 @@ public class CartServiceImpl implements CartService {
     public ResponseEntity<?> getCart(Integer page, Integer size) {
         try {
             Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-            Page<Cart> pageResult = cartRepository.findAll(pageable);
-
+            Page<Cart> pageResult = cartRepository.findByDeletedFalse(pageable);
             List<CartResponse> cartResponses = new ArrayList<>();
-
             for (Cart cart : pageResult.getContent()) {
-                Optional<User> user = userRepository.findById(cart.getId());
+                Optional<User> user = userRepository.findById((int)cart.getUserId().getId());
                 UserDto userDto = user.map(this::buildUserDto).orElse(null);
-
-                Optional<Book> book = bookRepository.findById(cart.getId());
+                Optional<Book> book = bookRepository.findById(cart.getBookId().getId());
                 BookDto bookDto = book.map(this::buildBookDto).orElse(null);
-
                 CartResponse cartResponse = CartResponse.builder()
+                        .id(cart.getId())
                         .user(userDto)
                         .book(bookDto)
                         .build();
@@ -101,22 +99,28 @@ public class CartServiceImpl implements CartService {
     public ResponseEntity<?> getCartById(Integer id) {
         ResponseObject res= new ResponseObject();
         try {
-                Optional<User> user = userRepository.findById(id);
+            Optional<Cart> cartOptional = cartRepository.findById(id);
+            if (cartOptional.isPresent()){
+                Optional<User> user = userRepository.findById((int)cartOptional.get().getUserId().getId());
                 UserDto userDto= null;
                 if (user.isPresent()){
                     userDto = buildUserDto(user.get());
                 }
-                Optional<Book> book = bookRepository.findById(id);
+                Optional<Book> book = bookRepository.findById(cartOptional.get().getBookId().getId());
                 BookDto bookDto= null;
                 if (book.isPresent()){
                     bookDto =buildBookDto(book.get());
                 }CartResponse cartResponse = CartResponse.builder()
+                        .id(cartOptional.get().getId())
                         .user(userDto)
                         .book(bookDto)
                         .build();
                 res.setMessage("get successful!");
                 res.setStatus(true);
                 res.setData(cartResponse);
+            }
+
+
             return ResponseEntity.ok(res);
         }catch (Exception e){
             res.setMessage("get false!");
@@ -127,44 +131,46 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> updateCartById(Integer id) {
+    public ResponseEntity<?> updateCartById(Integer id, CartRequest cartRequest) {
         ResponseObject res= new ResponseObject();
         try {
-            Optional<User> user = userRepository.findById(id);
-            UserDto userDto= null;
-            if (user.isPresent()){
-                userDto = buildUserDto(user.get());
+            Optional<Cart> cartOptional = cartRepository.findById(id);
+            if (cartOptional.isPresent()){
+                Optional<User> user = userRepository.findById(cartRequest.getUserId());
+                Optional<Book> book = bookRepository.findById(cartRequest.getBookId());
+                UserDto userDto= null;
+                BookDto bookDto= null;
+                if (user.isPresent()){
+                    userDto = buildUserDto(user.get());
+                }
+                if (book.isPresent()){
+                    bookDto =buildBookDto(book.get());
+                }
+                Cart cart = Cart.builder()
+                        .id(id)
+                        .userId(user.get())
+                        .bookId(book.get())
+                        .build();
+                cartRepository.save(cart);
+                CartResponse cartResponse = CartResponse.builder()
+                        .user(userDto)
+                        .book(bookDto)
+                        .build();
+                res.setStatus(true);
+                res.setData(cartResponse);
+                res.setMessage("update successful!");
             }
-            Optional<Book> book = bookRepository.findById(id);
-            BookDto bookDto= null;
-            if (book.isPresent()){
-                bookDto =buildBookDto(book.get());
-            }
-            Cart cart = Cart.builder()
-                    .id(id)
-                    .userId(user.get())
-                    .bookId(book.get())
-                    .build();
-            cartRepository.save(cart);
-            CartResponse cartResponse = CartResponse.builder()
-                    .user(userDto)
-                    .book(bookDto)
-                    .build();
-
-            res.setMessage("update successful!");
-            res.setStatus(true);
-            res.setData(cartResponse);
             return ResponseEntity.ok(res);
         }catch (Exception e){
             res.setMessage("update false!");
-            res.setStatus(true);
+            res.setStatus(false);
             res.setData(null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }
 
     @Override
-    public ResponseEntity<?> DeleteCartById(Integer id) {
+    public ResponseEntity<?> deleteCartById(Integer id) {
         ResponseObject res= new ResponseObject();
         try {
             Optional<User> user = userRepository.findById(id);
@@ -181,14 +187,13 @@ public class CartServiceImpl implements CartService {
                     .id(id)
                     .userId(user.get())
                     .bookId(book.get())
-                    .delete(true)
+                    .deleted(true)
                     .build();
             cartRepository.save(cart);
             CartResponse cartResponse = CartResponse.builder()
                     .user(userDto)
                     .book(bookDto)
                     .build();
-
             res.setMessage("add successful!");
             res.setStatus(true);
             res.setData(cartResponse);
@@ -198,6 +203,32 @@ public class CartServiceImpl implements CartService {
             res.setStatus(true);
             res.setData(null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> findCartByUser(Integer page, Integer size) {
+        try{
+            Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
+            Page<Cart> pageResult = cartRepository.findByDeletedFalse(pageable);
+            List<CartResponse> cartResponses = new ArrayList<>();
+            for (Cart cart : pageResult.getContent()) {
+                Optional<User> user = userRepository.findById((int)cart.getUserId().getId());
+                UserDto userDto = user.map(this::buildUserDto).orElse(null);
+                Optional<Book> book = bookRepository.findById(cart.getBookId().getId());
+                BookDto bookDto = book.map(this::buildBookDto).orElse(null);
+                CartResponse cartResponse = CartResponse.builder()
+                        .id(cart.getId())
+                        .user(userDto)
+                        .book(bookDto)
+                        .build();
+                cartResponses.add(cartResponse);
+            }
+            ApiResponse res = new ApiResponse(true, "Fetch books successful!", cartResponses, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            ApiResponse res = new ApiResponse(true, "Fetch books successful!", null, 0, 0, 0,0);
+            return ResponseEntity.ok(res);
         }
     }
 

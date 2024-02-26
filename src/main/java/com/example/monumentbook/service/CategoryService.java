@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Server
 public interface CategoryService {
-    ResponseEntity<?> findAllCategory();
-    ResponseEntity<?> saveCategory(@RequestBody CategoryRequest categoryRequest);
+    ResponseEntity<?> findAllCategory(Integer page,Integer size);
+    ResponseEntity<?> saveCategory( CategoryRequest categoryRequest);
+    ResponseEntity<?> findById(Integer id);
+    ResponseEntity<?> UpdateById(Integer id, CategoryRequest categoryRequest);
+    ResponseEntity<?> deleteById(Integer id);
 }

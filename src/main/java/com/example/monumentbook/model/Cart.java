@@ -24,5 +24,5 @@ public class Cart {
     @JoinColumn(name = "bookId")
     private Book bookId;
     private LocalDate date;
-    private boolean delete;
+    private boolean deleted;
 }

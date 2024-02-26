@@ -44,7 +44,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .phoneNumber(user.getPhoneNumber())
                     .role(user.getRole().name())
                     .token(jwt).build();
-
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // Handle generic signup failure
@@ -75,7 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             // Handle authentication failure
             emptyObject.setStatus(false);
             emptyObject.setMessage(message.loginFail());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(emptyObject);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptyObject);
         }
     }
 }

@@ -16,12 +16,11 @@ import lombok.NoArgsConstructor;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id")
+    @Column(name = "id")
     private Integer id;
     private String name;
     private String description;
-    @Column(name = "delete")
-    private boolean delete;
+    private boolean deleted;
 
     public CategoryDto toDto(){
         return  new CategoryDto(this.id,this.name, this.description);

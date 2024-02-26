@@ -23,7 +23,7 @@ public class Author {
     private String image;
     private LocalDate date;
     @Column(name = "deleted")
-    private boolean delete = false;
+    private boolean deleted = false;
     private boolean status;
 
 public AuthorDto toDto(){
