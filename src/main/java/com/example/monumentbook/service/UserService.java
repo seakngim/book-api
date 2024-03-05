@@ -1,5 +1,6 @@
 package com.example.monumentbook.service;
 
+import com.example.monumentbook.model.requests.UserRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -7,8 +8,8 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
     UserDetailsService userDetailsService();
-//    ResponseEntity<?> findAllUser();
-//    ResponseEntity<?> findUserBySubject(long id);
-//    ResponseEntity<?> findUserByShift(long id);
-//    ResponseEntity<?> findUser();
+    ResponseEntity<?> findAllUser();
+    ResponseEntity<?> findCurrentUser();
+    ResponseEntity<?> findUserById(Integer id);
+    ResponseEntity<?> updateCurrentUser(UserRequest userRequest);
 }

@@ -27,9 +27,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImp implements BookService {
@@ -39,11 +37,11 @@ public class BookServiceImp implements BookService {
     private final AuthorBookRepository authorBookRepository;
     private final BookCategoryRepository bookCategoryRepository;
     private final VendorRepository vendorRepository;
-    private final CustomerRepository customerRepository;
+    private final OrderRepository customerRepository;
 
     ResponseObject res = new ResponseObject();
 
-    public BookServiceImp(BookRepository bookRepository, AuthorRepository authorRepository, CategoryRepository categoryRepository, AuthorBookRepository authorBookRepository, BookCategoryRepository bookCategoryRepository, VendorRepository vendorRepository, CustomerRepository customerRepository) {
+    public BookServiceImp(BookRepository bookRepository, AuthorRepository authorRepository, CategoryRepository categoryRepository, AuthorBookRepository authorBookRepository, BookCategoryRepository bookCategoryRepository, VendorRepository vendorRepository, OrderRepository customerRepository) {
 
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
@@ -456,8 +454,6 @@ public class BookServiceImp implements BookService {
         User currentUser;
         if (authentication.getPrincipal() instanceof User) {
             currentUser = (User) authentication.getPrincipal();
-            System.out.println("currentUser: " + currentUser);
-            // rest of the code...
         } else {
             // Handle the case when the principal is not an instance of User
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
@@ -475,16 +471,16 @@ public class BookServiceImp implements BookService {
                         .publishDate(bookOptional.get().getPublishDate())
                         .qty(bookOptional.get().getQty() - customerRequest.getQty())
                         .price(bookOptional.get().getPrice())
-                        .delete(false)
+                        .delete(bookOptional.get().isDelete())
                         .build();
                 bookRepository.save(book);
                 Optional<Book> product = bookRepository.findById(id);
-                CustomerProduct customerProduct = CustomerProduct.builder()
-                        .customer_id(currentUser.getId())
-                        .customer_name(currentUser.getUsername())
+                CustomerOrder customerProduct = CustomerOrder.builder()
+                        .customerId(currentUser.getId())
+                        .customerName(currentUser.getUsername())
                         .phoneNumber(currentUser.getPhoneNumber())
-                        .product_id(id)
-                        .product_name(product.get().getTitle())
+                        .productId(id)
+                        .productName(product.get().getTitle())
                         .qty(customerRequest.getQty())
                         .price(book.getPrice())
                         .date(LocalDate.now())

@@ -1,0 +1,46 @@
+name: RS API - CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: self-hosted
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set Working Directory
+        run: |
+          WORKING_DIR="$(pwd)"
+          echo "Setting working directory to: $WORKING_DIR"
+        shell: bash
+
+      - name: Build with Gradle
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          gradle clean build
+
+      - name: Stop and remove Docker container
+        run: |
+          docker stop mb_api || true
+          docker rm mb_api || true
+          docker rmi mb_api || true
+        continue-on-error: true
+
+      - name: Build the Docker image
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          docker build -t mb_api .
+
+      - name: Run Docker container
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          docker run -d --name mb_api -p 9090:9090 --restart always mb_api

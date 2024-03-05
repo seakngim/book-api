@@ -8,13 +8,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
 @Builder
 public class UserResponse {
     private long id;
-    private String firstName;
-    private String lastName;
+    private String username;
+    private String phoneNum;
     private String email;
+    private String coverImg;
+    private String address;
     private Role role;
 }
