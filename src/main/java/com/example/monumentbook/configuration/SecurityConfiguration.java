@@ -38,10 +38,12 @@ public class SecurityConfiguration {
                                         "/api/v1/file/**",
                                         "api/v1/category/*",
                                         "api/v1/image/**",
-                                        "api/v1/author/**"
+                                        "api/v1/author/**",
+                                        "/api/v1/order/*"
                                         )
                         .permitAll()
                                 .requestMatchers("/api/v1/book/*").hasAnyAuthority(Role.USER.toString(),Role.ADMIN.toString())
+                                .requestMatchers("/api/v1/user/*").hasAnyAuthority(Role.USER.toString(),Role.ADMIN.toString())
                                 .anyRequest()
                                 .authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))

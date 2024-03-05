@@ -1,22 +1,16 @@
-package com.example.monumentbook.model;
+package com.example.monumentbook.model.responses;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @Builder
-public class CustomerProduct {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+public class OrderResponse {
     private Integer id;
     private String customer_name;
     private String phoneNumber;

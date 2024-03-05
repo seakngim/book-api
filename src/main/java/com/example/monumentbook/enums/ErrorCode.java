@@ -33,8 +33,6 @@ public enum ErrorCode {
     }
 
     public HttpStatus getStatus() {
-
         return status;
-
     }
 }
