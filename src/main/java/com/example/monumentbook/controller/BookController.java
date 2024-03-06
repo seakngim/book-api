@@ -100,7 +100,7 @@ public class BookController {
     public ResponseEntity<?> deleteBestSell(@RequestBody RequestById bookIds){
         return bookService.deleteBestSell(bookIds);
     }
-    @PostMapping("/delete- new-arrival")
+    @PostMapping("/delete-new-arrival")
     @Operation(summary = "add book to table New arrival")
     public ResponseEntity<?> deleteNewArrival(@RequestBody RequestById bookIds){
         return bookService.deleteNewArrival(bookIds);

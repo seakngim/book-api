@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -506,11 +507,11 @@ public class BookServiceImp implements BookService {
     public ResponseEntity<?> getBookOfTheWeek(Integer page, Integer size) {
         try {
             Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-            Page<BookDto> pageResult = bookRepository.findByDeleteFalseAndBestSellTrue(pageable).map(Book::toDto);
+            Page<BookDto> pageResult = bookRepository.findByDeleteFalseAndOfTheWeekTrue(pageable).map(Book::toDto);
             List<BookResponse> bookObj = new ArrayList<>();
             for (BookDto book : pageResult.getContent()) {
                 Optional<Book> bookOptional = bookRepository.findById(book.getId());
-                if (bookOptional.isPresent() && !bookOptional.get().isDelete() && bookOptional.get().isBestSell()) {
+                if (bookOptional.isPresent()) {
                     List<CategoryDto> categoryObj = getCategoriesByBookId(bookOptional.get());
                     List<AuthorDto> authorObj = getAuthorsByBookId(bookOptional.get());
 
@@ -538,7 +539,7 @@ public class BookServiceImp implements BookService {
             List<BookResponse> bookObj = new ArrayList<>();
             for (BookDto book : pageResult.getContent()) {
                 Optional<Book> bookOptional = bookRepository.findById(book.getId());
-                if (bookOptional.isPresent() && !bookOptional.get().isDelete() && bookOptional.get().isBestSell()) {
+                if (bookOptional.isPresent()) {
                     List<CategoryDto> categoryObj = getCategoriesByBookId(bookOptional.get());
                     List<AuthorDto> authorObj = getAuthorsByBookId(bookOptional.get());
                     BookResponse bookResponse = createBookResponse(bookOptional.get(), categoryObj, authorObj);
@@ -566,7 +567,7 @@ public class BookServiceImp implements BookService {
             List<BookResponse> bookObj = new ArrayList<>();
             for (BookDto book : pageResult.getContent()) {
                 Optional<Book> bookOptional = bookRepository.findById(book.getId());
-                if (bookOptional.isPresent() && !bookOptional.get().isDelete() && bookOptional.get().isBestSell()) {
+                if (bookOptional.isPresent()) {
                     List<CategoryDto> categoryObj = getCategoriesByBookId(bookOptional.get());
                     List<AuthorDto> authorObj = getAuthorsByBookId(bookOptional.get());
 
@@ -587,69 +588,68 @@ public class BookServiceImp implements BookService {
         }
     }
 //    fuction update and update
-public ResponseEntity<?> BookFlags(RequestById requestById, boolean ofTheWeekFlag, boolean bestSellFlag, boolean newArrivalFlag) {
-    try {
-        List<Book> updatedBooks = new ArrayList<>();
-        for (Integer id : requestById.getIdList()) {
-            Optional<Book> bookOptional = bookRepository.findById(id);
-            if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
-                Book updatedBook = Book.builder()
-                        .id(id)
-                        .isbn(bookOptional.get().getIsbn())
-                        .title(bookOptional.get().getTitle())
-                        .description(bookOptional.get().getDescription())
-                        .coverImg(bookOptional.get().getCoverImg())
-                        .publisher(bookOptional.get().getPublisher())
-                        .qty(bookOptional.get().getQty())
-                        .price(bookOptional.get().getPrice())
-                        .publishDate(bookOptional.get().getPublishDate())
-                        .ofTheWeek(ofTheWeekFlag)
-                        .bestSell(bestSellFlag)
-                        .newArrival(newArrivalFlag)
-                        .build();
-                updatedBooks.add(updatedBook);
-            }
-        }
 
-        if (!updatedBooks.isEmpty()) {
-            bookRepository.saveAll(updatedBooks);
-            ApiResponse res = new ApiResponse(true, "Update books success!", updatedBooks, 0, 0, 0, 0);
-            return ResponseEntity.ok(res);
-        } else {
-            ApiResponse res = new ApiResponse(false, "No valid books found to update.", null, 0, 0, 0, 0);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+    public ResponseEntity<?> BookFlags(RequestById requestById, String fieldName, boolean status) {
+        try {
+            List<Book> updatedBooks = new ArrayList<>();
+            for (Integer id : requestById.getIdList()) {
+                Optional<Book> bookOptional = bookRepository.findById(id);
+                if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
+                    Book updatedBook = updateField(bookOptional.get(), fieldName, status);
+                    updatedBooks.add(updatedBook);
+                }
+            }
+
+            if (!updatedBooks.isEmpty()) {
+                bookRepository.saveAll(updatedBooks);
+                ApiResponse res = new ApiResponse(true, "Update books success!", updatedBooks, 0, 0, 0, 0);
+                return ResponseEntity.ok(res);
+            } else {
+                ApiResponse res = new ApiResponse(false, "No valid books found to update.", null, 0, 0, 0, 0);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
-}
+
+    private Book updateField(Book book, String fieldName, boolean status) {
+        try {
+            Field field = Book.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.setBoolean(book, status);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace(); // Handle exception as needed
+        }
+        return book;
+    }
     @Override
     public ResponseEntity<?> deleteBookOfTheWeek(RequestById requestById) {
-        return BookFlags(requestById, false, false, false);
+        return BookFlags(requestById, "ofTheWeek",false);
     }
 
     @Override
     public ResponseEntity<?> deleteBestSell(RequestById requestById) {
-        return BookFlags(requestById, false, false, false);
+        return BookFlags(requestById, "bestSell", false);
     }
 
     @Override
     public ResponseEntity<?> deleteNewArrival(RequestById requestById) {
-        return BookFlags(requestById, false, false, false);
+        return BookFlags(requestById, "newArrival", false);
     }
     @Override
     public ResponseEntity<?> addBookOfTheWeek(RequestById requestById) {
-        return BookFlags(requestById, true, false, false);
+        return BookFlags(requestById, "ofTheWeek", true);
     }
 
     @Override
     public ResponseEntity<?> addBestSell(RequestById requestById) {
-        return BookFlags(requestById, false, true, false);
+        return BookFlags(requestById, "bestSell", true);
     }
 
     @Override
     public ResponseEntity<?> addNewArrival(RequestById requestById) {
-        return BookFlags(requestById, false, false, true);
+        return BookFlags(requestById, "newArrival",  true);
     }
 
 

@@ -25,6 +25,7 @@ public class Author {
     @Column(name = "deleted")
     private boolean deleted = false;
     private boolean status;
+    private String quote;
 
 public AuthorDto toDto(){
     return new AuthorDto(this.id, this.name, this.description, this.image);

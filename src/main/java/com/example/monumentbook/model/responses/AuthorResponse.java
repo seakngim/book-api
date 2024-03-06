@@ -18,7 +18,8 @@ public class AuthorResponse {
     private String name;
     private String description;
     private String image;
+    private String quote;
     private LocalDate date;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<BookDto> book;
+    private List<BookDto> books;
 }

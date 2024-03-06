@@ -13,4 +13,6 @@ import java.util.List;
 public interface AuthorRepository extends JpaRepository<Author,Integer> {
 
     Page<Author> findByDeletedFalse(Pageable pageable);
+
+    Page<Author> findByDeletedFalseAndStatusTrue(Pageable pageable);
 }

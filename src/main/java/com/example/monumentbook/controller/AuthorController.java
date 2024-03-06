@@ -34,5 +34,9 @@ public class AuthorController {
     public ResponseEntity<?> deleted(@Param("author Id") Integer id){
         return ResponseEntity.ok(authorService.deleted(id));
     }
+    @GetMapping("/feature")
+    public ResponseEntity<?> feature(@RequestParam(defaultValue = "1") Integer page,@RequestParam(defaultValue = "10") Integer size){
+        return ResponseEntity.ok(authorService.getFeature(page, size));
+    }
 
 }

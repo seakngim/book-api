@@ -10,4 +10,6 @@ public interface AuthorService {
     ResponseEntity<?> getAll(Integer page, Integer size);
     ResponseEntity<?> update(Integer id, AuthorRequest authorRequest);
     ResponseEntity<?> deleted(Integer id);
+
+    ResponseEntity<?> getFeature(Integer page, Integer size);
 }
