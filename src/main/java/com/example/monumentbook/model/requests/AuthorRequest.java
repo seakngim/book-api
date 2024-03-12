@@ -14,4 +14,5 @@ public class AuthorRequest {
     private String name;
     private String description;
     private String image;
+    private String quote;
 }

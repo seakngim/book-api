@@ -41,6 +41,7 @@ public class AuthorServiceImp implements AuthorService {
                 .name(authorRequest.getName())
                 .description(authorRequest.getDescription())
                 .image(authorRequest.getImage())
+                .quote(authorRequest.getQuote())
                 .date(LocalDate.now())
                 .build();
         authorRepository.save(author);
@@ -62,6 +63,7 @@ public class AuthorServiceImp implements AuthorService {
                     .description(author.getDescription())
                     .image(author.getImage())
                     .date(author.getDate())
+                    .quote(author.getQuote())
                     .books(books)
                     .build();
             ResponseObject res = new ResponseObject();
@@ -91,15 +93,16 @@ public class AuthorServiceImp implements AuthorService {
                         .description(author.getDescription())
                         .image(author.getImage())
                         .books(books)
+                        .quote(author.getQuote())
                         .date(author.getDate())
                         .build();
                 authors.add(authorResponse);
             }
             if (!authors.isEmpty()) {
-                ApiResponse res = new ApiResponse(true, "Fetch books successful!", authors, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
+                ApiResponse res = new ApiResponse(true, "Fetch Author successful!", authors, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
                 return ResponseEntity.ok(res);
             } else {
-                ApiResponse res = new ApiResponse(false, "No books found!", null, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
+                ApiResponse res = new ApiResponse(false, "No Author found!", null, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
             }
         }catch (Exception e){
@@ -119,6 +122,7 @@ public class AuthorServiceImp implements AuthorService {
                     .description(authorRequest.getDescription() != null ? authorRequest.getDescription():authorOptional.get().getImage())
                     .image(authorRequest.getImage() != null ? authorRequest.getImage():authorOptional.get().getImage() )
                     .date(authorOptional.get().getDate())
+                    .quote(authorRequest.getQuote() != null? authorRequest.getQuote():authorOptional.get().getQuote())
                     .build();
             authorRepository.save(author);
             List<BookDto> books = bookFlags(authorOptional.get());
@@ -127,6 +131,7 @@ public class AuthorServiceImp implements AuthorService {
                     .name(author.getName())
                     .description(author.getDescription())
                     .image(author.getImage())
+                    .quote(author.getQuote())
                     .date(author.getDate())
                     .books(books)
                     .build();
@@ -154,6 +159,7 @@ public class AuthorServiceImp implements AuthorService {
                         .description(authorOptional.get().getImage())
                         .image(authorOptional.get().getImage() )
                         .date(authorOptional.get().getDate())
+                        .quote(authorOptional.get().getQuote())
                         .deleted(true)
                         .build();
                 authorRepository.save(author);
@@ -163,6 +169,7 @@ public class AuthorServiceImp implements AuthorService {
                         .name(author.getName())
                         .description(author.getDescription())
                         .image(author.getImage())
+                        .quote(author.getQuote())
                         .date(author.getDate())
                         .books(books)
                         .build();

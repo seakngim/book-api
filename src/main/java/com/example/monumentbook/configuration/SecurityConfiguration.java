@@ -37,10 +37,11 @@ public class SecurityConfiguration {
                                         "/api/v1/auth/**",
                                         "/api/v1/file/**",
                                         "api/v1/category/*",
-                                        "api/v1/image/**",
+                                        "api/v1/image/*",
                                         "api/v1/author/**",
                                         "/api/v1/book/*",
-                                        "/api/v1/order/*"
+                                        "/api/v1/order/*",
+                                        "/api/v1/news/*"
                                         )
                         .permitAll()
 //                                .requestMatchers("/api/v1/book/*").hasAnyAuthority(Role.USER.toString(),Role.ADMIN.toString())
