@@ -33,7 +33,6 @@ public class NewServiceImpl implements NewsService {
     @Override
     public ResponseEntity<?> addNews(NewsRequest newsRequest) {
         try{
-
             News news = News.builder()
                 .title(newsRequest.getTitle())
                 .description(newsRequest.getDescription())
@@ -67,6 +66,7 @@ public class NewServiceImpl implements NewsService {
                         .id(news.getId())
                         .title(news.getTitle())
                         .coverImg(news.getCoverImg())
+                        .description(news.getDescription())
                         .date(news.getDate())
                         .build())
                 .collect(Collectors.toList());
@@ -117,11 +117,11 @@ public class NewServiceImpl implements NewsService {
                         .description(newsOptional.get().getDescription())
                         .coverImg(newsOptional.get().getCoverImg())
                         .date(LocalDate.now())
-                        .delete(false)
+                        .delete(true)
                         .build();
                 newsRepository.save(news);
                 res.setStatus(true);
-                res.setMessage("out success!");
+                res.setMessage("delete success!");
                 res.setData(news);
             }
             return ResponseEntity.ok(res);
