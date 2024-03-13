@@ -38,5 +38,8 @@ public class AuthorController {
     public ResponseEntity<?> feature(@RequestParam(defaultValue = "1") Integer page,@RequestParam(defaultValue = "10") Integer size){
         return ResponseEntity.ok(authorService.getFeature(page, size));
     }
-
+    @PostMapping("/addFeature")
+    public ResponseEntity<?> addFeature(@Param("id") Integer id){
+        return ResponseEntity.ok(authorService.addFeature(id));
+    }
 }

@@ -193,6 +193,50 @@ public class AuthorServiceImp implements AuthorService {
     }
 
     @Override
+    public ResponseEntity<?> addFeature(Integer id) {
+        try {
+            Optional<Author> authorOptional = authorRepository.findById(id);
+            if (authorOptional.isPresent()) {
+                Author authorToSetTrue = authorOptional.get();
+                // Set the specific row to true
+                authorToSetTrue.setStatus(true);
+
+                authorRepository.save(authorToSetTrue);
+
+                // Set all other rows to false
+                authorRepository.setAllOtherRowsToFalse(id);
+
+                List<BookDto> books = bookFlags(authorToSetTrue);
+                AuthorResponse authorResponse = AuthorResponse.builder()
+                        .id(authorToSetTrue.getId())
+                        .name(authorToSetTrue.getName())
+                        .description(authorToSetTrue.getDescription())
+                        .image(authorToSetTrue.getImage())
+                        .quote(authorToSetTrue.getQuote())
+                        .date(authorToSetTrue.getDate())
+                        .books(books)
+                        .build();
+
+                ResponseObject res = new ResponseObject();
+                res.setMessage("Author status updated successfully!");
+                res.setStatus(true);
+                res.setData(authorResponse);
+                return ResponseEntity.ok(res);
+            } else {
+                ResponseObject res = new ResponseObject();
+                res.setMessage("Author not found");
+                res.setStatus(false);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+            }
+        }catch (Exception e){
+            ResponseObject res = new ResponseObject();
+            res.setMessage("Author not found");
+            res.setStatus(false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+        }
+    }
+
+    @Override
     public ResponseEntity<?> getFeature(Integer page, Integer size) {
         try {
             Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
