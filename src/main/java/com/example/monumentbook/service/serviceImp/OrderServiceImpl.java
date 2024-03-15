@@ -61,8 +61,6 @@ public class OrderServiceImpl implements OrderService {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User currentUser = (User) authentication.getPrincipal();
-            System.out.println("currentUser" + currentUser);
-
             List<CustomerOrder> orderList = orderRepository.findAllByCustomerId(currentUser.getId());
             List<OrderResponse> customerOrderList = new ArrayList<>();
             ResponseObject res = new ResponseObject(); // Move inside the try block

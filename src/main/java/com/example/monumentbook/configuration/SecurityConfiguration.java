@@ -41,7 +41,9 @@ public class SecurityConfiguration {
                                         "api/v1/author/**",
                                         "/api/v1/book/*",
                                         "/api/v1/order/*",
-                                        "/api/v1/news/*"
+                                        "/api/v1/news/*",
+                                        "/api/v1/bookmarks/*",
+                                        "/api/v1/cart/*"
                                         )
                         .permitAll()
 //                                .requestMatchers("/api/v1/book/*").hasAnyAuthority(Role.USER.toString(),Role.ADMIN.toString())

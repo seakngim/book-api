@@ -7,6 +7,7 @@ import com.example.monumentbook.model.dto.BookDto;
 import com.example.monumentbook.model.dto.CartDto;
 import com.example.monumentbook.model.dto.UserDto;
 import com.example.monumentbook.model.requests.CartRequest;
+import com.example.monumentbook.model.requests.CartUpdateRequest;
 import com.example.monumentbook.model.responses.ApiResponse;
 import com.example.monumentbook.model.responses.CartResponse;
 import com.example.monumentbook.repository.BookRepository;
@@ -42,12 +43,15 @@ public class CartServiceImpl implements CartService {
         ResponseObject res = new ResponseObject();
 
         try {
-            Optional<Book> book = bookRepository.findById(cartRequest.getBookId());
-            Optional<User> user = userRepository.findById(cartRequest.getUserId());
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = (User) authentication.getPrincipal();
 
-            if (book.isPresent() && user.isPresent()) {
+
+            Optional<Book> book = bookRepository.findById(cartRequest.getBookId());
+
+            if (book.isPresent()) {
                 // Check if a cart entry already exists for the given userId and bookId
-                Optional<Cart> existingCart = cartRepository.findByUserIdAndBookIdAndDeletedFalse(user.get(), book.get());
+                Optional<Cart> existingCart = cartRepository.findByUserIdAndBookIdAndDeletedFalse(currentUser, book.get());
                 if (existingCart.isPresent()) {
                     // Handle the conflict - cart entry already exists
                     res.setMessage("Cart entry already exists for the given user and book.");
@@ -56,19 +60,21 @@ public class CartServiceImpl implements CartService {
                 } else {
                     // Create and save the new cart entry
                     Cart cart = Cart.builder()
-                            .userId(user.get())
+                            .userId(currentUser)
                             .bookId(book.get())
+                            .qty(cartRequest.getQty())
                             .date(LocalDate.now())
                             .build();
                     cartRepository.save(cart);
-
                     // Build response objects
                     BookDto bookObj = buildBookDto(book.get());
-                    UserDto userObj = buildUserDto(user.get());
+                    UserDto userObj = buildUserDto(currentUser);
                     CartResponse cartResponse = CartResponse.builder()
                             .id(cart.getId())
                             .user(userObj)
                             .book(bookObj)
+                            .qty(cart.getQty())
+                            .date(cart.getDate())
                             .build();
 
                     res.setMessage("Add successful!");
@@ -91,7 +97,6 @@ public class CartServiceImpl implements CartService {
             return ResponseEntity.ok(res);
         }
     }
-
     @Override
     public ResponseEntity<?> getCart(Integer page, Integer size) {
         try {
@@ -107,6 +112,7 @@ public class CartServiceImpl implements CartService {
                         .id(cart.getId())
                         .user(userDto)
                         .book(bookDto)
+                        .qty(cart.getQty())
                         .date(cart.getDate())
                         .build();
                 cartResponses.add(cartResponse);
@@ -137,6 +143,7 @@ public class CartServiceImpl implements CartService {
                         .id(cartOptional.get().getId())
                         .user(userDto)
                         .book(bookDto)
+                        .qty(cartOptional.get().getQty())
                         .date(cartOptional.get().getDate())
                         .build();
                 res.setMessage("get successful!");
@@ -155,25 +162,26 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> updateCartById(Integer id, CartRequest cartRequest) {
+    public ResponseEntity<?> updateCartById(Integer id, CartUpdateRequest cartRequest) {
         ResponseObject res= new ResponseObject();
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = (User) authentication.getPrincipal();
+
             Optional<Cart> cartOptional = cartRepository.findById(id);
             if (cartOptional.isPresent()){
-                Optional<User> user = userRepository.findById(cartRequest.getUserId());
-                Optional<Book> book = bookRepository.findById(cartRequest.getBookId());
+                Optional<Book> book = bookRepository.findById(cartOptional.get().getBookId().getId());
                 UserDto userDto= null;
                 BookDto bookDto= null;
-                if (user.isPresent()){
-                    userDto = buildUserDto(user.get());
-                }
                 if (book.isPresent()){
                     bookDto =buildBookDto(book.get());
                 }
                 Cart cart = Cart.builder()
                         .id(cartOptional.get().getId())
-                        .userId(user.get())
+                        .userId(currentUser)
                         .bookId(book.get())
+                        .qty(cartRequest.getQty())
+                        .date(cartOptional.get().getDate())
                         .build();
                 cartRepository.save(cart);
                 CartResponse cartResponse = CartResponse.builder()
@@ -181,6 +189,7 @@ public class CartServiceImpl implements CartService {
                         .user(userDto)
                         .book(bookDto)
                         .date(cart.getDate())
+                        .qty(cart.getQty())
                         .build();
                 res.setStatus(true);
                 res.setData(cartResponse);
@@ -213,16 +222,13 @@ public class CartServiceImpl implements CartService {
                     .id(id)
                     .userId(user.get())
                     .bookId(book.get())
+                    .qty(book.get().getQty())
                     .deleted(true)
                     .build();
             cartRepository.save(cart);
-            CartResponse cartResponse = CartResponse.builder()
-                    .user(userDto)
-                    .book(bookDto)
-                    .build();
-            res.setMessage("add successful!");
+            res.setMessage("delete successful cart id" + cart.getId());
             res.setStatus(true);
-            res.setData(cartResponse);
+            res.setData(null);
             return ResponseEntity.ok(res);
         }catch (Exception e){
             res.setMessage("add false!");
@@ -236,12 +242,9 @@ public class CartServiceImpl implements CartService {
     public ResponseEntity<?> findCartByUser(Integer page, Integer size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
-
-        System.out.println( currentUser +"skfvsafsais");
         try{
             Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
             Page<Cart> pageResult = cartRepository.findByUserIdIdAndDeletedFalse(currentUser.getId(), pageable);
-            System.out.println(pageResult + "skfwssasf");
 
             List<CartResponse> cartResponses = new ArrayList<>();
             for (Cart cart : pageResult.getContent()) {
@@ -252,6 +255,8 @@ public class CartServiceImpl implements CartService {
                 CartResponse cartResponse = CartResponse.builder()
                         .id(cart.getId())
                         .user(userDto)
+                        .qty(cart.getQty())
+                        .date(cart.getDate())
                         .book(bookDto)
                         .build();
                 cartResponses.add(cartResponse);
@@ -259,7 +264,6 @@ public class CartServiceImpl implements CartService {
             ApiResponse res = new ApiResponse(true, "Fetch books successful!", cartResponses, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
             return ResponseEntity.ok(res);
         } catch (Exception e) {
-            System.out.println("sdfsbds" +e);
             ApiResponse res = new ApiResponse(true, "Fetch books successful!", null, 0, 0, 0,0);
             return ResponseEntity.ok(res);
         }

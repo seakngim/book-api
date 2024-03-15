@@ -1,6 +1,7 @@
 package com.example.monumentbook.controller;
 
 import com.example.monumentbook.model.requests.CartRequest;
+import com.example.monumentbook.model.requests.CartUpdateRequest;
 import com.example.monumentbook.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -38,7 +39,7 @@ public class CartController {
     }
     @PutMapping("/update")
     @Operation(summary = "Update cart by id")
-    public ResponseEntity<?> update(@Param("CART ID INTEGER")Integer id,@RequestBody CartRequest cartRequest){
+    public ResponseEntity<?> update(@Param("CART ID INTEGER")Integer id,@RequestBody CartUpdateRequest cartRequest){
         return cartService.updateCartById(id,cartRequest);
     }
     @GetMapping("/byCurrentUser")
