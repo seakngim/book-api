@@ -123,6 +123,8 @@ public class AuthorServiceImp implements AuthorService {
                     .image(authorRequest.getImage() != null ? authorRequest.getImage():authorOptional.get().getImage() )
                     .date(authorOptional.get().getDate())
                     .quote(authorRequest.getQuote() != null? authorRequest.getQuote():authorOptional.get().getQuote())
+                    .deleted(authorOptional.get().isDeleted())
+                    .status(authorOptional.get().isStatus())
                     .build();
             authorRepository.save(author);
             List<BookDto> books = bookFlags(authorOptional.get());

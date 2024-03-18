@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,7 +29,7 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors().and().csrf(AbstractHttpConfigurer::disable)
+        http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/",
                                         "/v3/api-docs/**",
@@ -41,13 +42,13 @@ public class SecurityConfiguration {
                                         "api/v1/author/**",
                                         "/api/v1/book/*",
                                         "/api/v1/order/*",
-                                        "/api/v1/news/*",
+
                                         "/api/v1/bookmarks/*",
                                         "/api/v1/cart/*"
                                         )
                         .permitAll()
 //                                .requestMatchers("/api/v1/book/*").hasAnyAuthority(Role.USER.toString(),Role.ADMIN.toString())
-                                .requestMatchers("/api/v1/user/*").hasAnyAuthority(Role.USER.toString(),Role.ADMIN.toString())
+                                .requestMatchers("/api/v1/user/*","/api/v1/news/*").hasAnyAuthority(Role.USER.toString(),Role.ADMIN.toString())
                                 .anyRequest()
                                 .authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
