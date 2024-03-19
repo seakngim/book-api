@@ -35,7 +35,7 @@ public class UserController {
     }
     @PutMapping("/updateCurrentUser")
     @Operation(summary = "get all user from")
-    ResponseEntity<?> updateCurrentUser(UserRequest userRequest){
+    ResponseEntity<?> updateCurrentUser(@RequestBody UserRequest userRequest){
         return userService.updateCurrentUser(userRequest);
     }
 

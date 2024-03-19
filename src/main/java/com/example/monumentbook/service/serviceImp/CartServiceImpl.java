@@ -278,6 +278,8 @@ public class CartServiceImpl implements CartService {
                 .coverImg(book.getCoverImg())
                 .publishDate(book.getPublishDate())
                 .isbn(book.getIsbn())
+                .price(book.getPrice())
+                .qty(book.getQty())
                 .build();
     }
 

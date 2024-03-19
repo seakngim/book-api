@@ -16,4 +16,6 @@ public class BookDto {
     private String isbn;
     private String publisher;
     private LocalDate publishDate;
+    private int qty;
+    private int price;
 }

@@ -424,7 +424,10 @@ public class BookServiceImp implements BookService {
                         .publishDate(bookOptional.get().getPublishDate())
                         .price(bookOptional.get().getPrice())
                         .qty(bookOptional.get().getQty() + productRequest.getQty())
-                        .delete(false)
+                        .delete(bookOptional.get().isDelete())
+                        .bestSell(bookOptional.get().isBestSell())
+                        .newArrival(bookOptional.get().isNewArrival())
+                        .ofTheWeek(bookOptional.get().isOfTheWeek())
                         .build();
                 bookRepository.save(book);
                 Vendor vendor = Vendor.builder()
@@ -450,7 +453,7 @@ public class BookServiceImp implements BookService {
     }
 
     @Override
-    public ResponseEntity<?> outProductById(Integer id, CustomerRequest customerRequest) {
+    public ResponseEntity<?> outProductById(List<CustomerRequest> customerRequests) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser;
         if (authentication.getPrincipal() instanceof User) {
@@ -459,48 +462,52 @@ public class BookServiceImp implements BookService {
             // Handle the case when the principal is not an instance of User
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
         }
+
+        List<Object> responses = new ArrayList<>(); // List to store individual responses
+
+        for (CustomerRequest customerRequest : customerRequests) {
+            ResponseEntity<?> response = processCustomerRequest(currentUser, customerRequest);
+            responses.add(response.getBody()); // Add the response body to the list
+        }
+
+        return ResponseEntity.ok(responses); // Return the list of responses
+    }
+
+    private ResponseEntity<?> processCustomerRequest(User currentUser, CustomerRequest customerRequest) {
         try {
+            Integer id = customerRequest.getProductId();
             Optional<Book> bookOptional = bookRepository.findById(id);
             if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
-                Book book = Book.builder()
-                        .id(bookOptional.get().getId())
-                        .isbn(bookOptional.get().getIsbn())
-                        .title(bookOptional.get().getTitle())
-                        .description(bookOptional.get().getDescription())
-                        .coverImg(bookOptional.get().getCoverImg())
-                        .publisher(bookOptional.get().getPublisher())
-                        .publishDate(bookOptional.get().getPublishDate())
-                        .qty(bookOptional.get().getQty() - customerRequest.getQty())
-                        .price(bookOptional.get().getPrice())
-                        .delete(bookOptional.get().isDelete())
-                        .build();
-                bookRepository.save(book);
-                Optional<Book> product = bookRepository.findById(id);
-                CustomerOrder customerProduct = CustomerOrder.builder()
-                        .customerId(currentUser.getId())
-                        .customerName(currentUser.getUsername())
-                        .phoneNumber(currentUser.getPhoneNumber())
-                        .productId(id)
-                        .productName(product.get().getTitle())
-                        .qty(customerRequest.getQty())
-                        .price(book.getPrice())
-                        .date(LocalDate.now())
-                        .build();
-                customerRepository.save(customerProduct);
-                res.setStatus(true);
-                res.setMessage("out success!");
-                res.setData(customerProduct);
-                return ResponseEntity.ok(res);
+                Book book = bookOptional.get();
+                int requestedQty = customerRequest.getQty();
+                int availableQty = book.getQty();
+                if (requestedQty <= availableQty) {
+                    book.setQty(availableQty - requestedQty);
+                    bookRepository.save(book);
+                    CustomerOrder customerOrder = CustomerOrder.builder()
+                            .customerId(currentUser.getId())
+                            .customerName(currentUser.getUsername())
+                            .phoneNumber(currentUser.getPhoneNumber())
+                            .productId(id)
+                            .productName(book.getTitle())
+                            .qty(requestedQty)
+                            .price(book.getPrice())
+                            .date(LocalDate.now())
+                            .build();
+                    customerRepository.save(customerOrder);
+
+                    return ResponseEntity.ok(customerOrder); // Return success response
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requested quantity exceeds available quantity");
+                }
             } else {
-                res.setStatus(false);
-                res.setMessage("add false!");
-                res.setData(null);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found or deleted");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
 
     //get book of the week
     @Override

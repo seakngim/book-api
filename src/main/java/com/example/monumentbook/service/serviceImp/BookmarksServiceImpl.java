@@ -9,6 +9,8 @@ import com.example.monumentbook.model.dto.UserDto;
 import com.example.monumentbook.model.requests.BookmarksRequest;
 import com.example.monumentbook.model.requests.CartRequest;
 import com.example.monumentbook.model.responses.ApiResponse;
+import com.example.monumentbook.model.responses.BookResponse;
+import com.example.monumentbook.model.responses.BookmarksResponse;
 import com.example.monumentbook.model.responses.CartResponse;
 import com.example.monumentbook.repository.BookRepository;
 import com.example.monumentbook.repository.BookmarkRepository;
@@ -66,7 +68,7 @@ public class BookmarksServiceImpl implements BookmarksService {
                     // Build response objects
                     BookDto bookObj = buildBookDto(book.get());
                     UserDto userObj = buildUserDto(currentUser);
-                    CartResponse cartResponse = CartResponse.builder()
+                    BookmarksResponse bookmarksResponse = BookmarksResponse.builder()
                             .id(bookmarks.getId())
                             .user(userObj)
                             .book(bookObj)
@@ -75,7 +77,7 @@ public class BookmarksServiceImpl implements BookmarksService {
 
                     res.setMessage("Add successful!");
                     res.setStatus(true);
-                    res.setData(cartResponse);
+                    res.setData(bookmarksResponse);
                 }
             } else {
                 // Handle case where book or user is not found
@@ -140,21 +142,21 @@ public class BookmarksServiceImpl implements BookmarksService {
             Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
             Page<Bookmarks> pageResult = bookmarkRepository.findByUserIdIdAndDeletedFalse(currentUser.getId(), pageable);
 
-            List<CartResponse> cartResponses = new ArrayList<>();
+            List<BookmarksResponse> bookmarksResponses = new ArrayList<>();
             for (Bookmarks bookmarks : pageResult.getContent()) {
                 Optional<User> user = userRepository.findById((int)bookmarks.getUserId().getId());
                 UserDto userDto = user.map(this::buildUserDto).orElse(null);
                 Optional<Book> book = bookRepository.findById(bookmarks.getBookId().getId());
                 BookDto bookDto = book.map(this::buildBookDto).orElse(null);
-                CartResponse cartResponse = CartResponse.builder()
+                BookmarksResponse cartResponse = BookmarksResponse.builder()
                         .id(bookmarks.getId())
                         .user(userDto)
                         .date(bookmarks.getDate())
                         .book(bookDto)
                         .build();
-                cartResponses.add(cartResponse);
+                bookmarksResponses.add(cartResponse);
             }
-            ApiResponse res = new ApiResponse(true, "Fetch books successful!", cartResponses, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
+            ApiResponse res = new ApiResponse(true, "Fetch books successful!", bookmarksResponses, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
             return ResponseEntity.ok(res);
         } catch (Exception e) {
             ApiResponse res = new ApiResponse(true, "Fetch books successful!", null, 0, 0, 0,0);

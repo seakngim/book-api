@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class CategoryRequest {
     private String description;
     private String name;
+    private String coverImage;
 }

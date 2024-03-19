@@ -16,7 +16,7 @@ public interface BookService {
     ResponseEntity<?> updateBook(BookRequest book, Integer id);
     ResponseEntity<?> DeleteById(Integer id);
     ResponseEntity<?> addProductById(Integer id, ProductRequest productRequest);
-    ResponseEntity<?> outProductById(Integer id , CustomerRequest customerRequest);
+    ResponseEntity<?> outProductById(List<CustomerRequest> customerRequest);
     ResponseEntity<?> getBookOfTheWeek(Integer page, Integer size);
     ResponseEntity<?> getBestSell(Integer page, Integer size);
     ResponseEntity<?> getNewArrival(Integer page, Integer size);

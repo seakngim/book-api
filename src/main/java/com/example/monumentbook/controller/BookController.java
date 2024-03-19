@@ -56,8 +56,8 @@ public class BookController {
     }
     @PostMapping("/out-product")
     @Operation(summary = "sell book")
-    private ResponseEntity<?> outProduct(@Param("book id") Integer id, @RequestBody CustomerRequest customerRequest){
-        return  bookService.outProductById(id,customerRequest);
+    private ResponseEntity<?> outProduct(@RequestBody List<CustomerRequest> customerRequest){
+        return  bookService.outProductById(customerRequest);
     }
 
     @GetMapping("/get-book-of-the-week")

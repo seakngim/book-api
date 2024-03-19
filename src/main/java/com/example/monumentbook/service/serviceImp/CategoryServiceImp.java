@@ -40,6 +40,7 @@ public class CategoryServiceImp implements CategoryService {
                         .id(bookCategory.getId())
                         .name(bookCategory.getName())
                         .description(bookCategory.getDescription())
+                        .coverImage(bookCategory.getCoverImage())
                         .build();
                 categoryResponseList.add(categoryResponse);
             }
@@ -60,6 +61,7 @@ public class CategoryServiceImp implements CategoryService {
             categoryObj =  Category.builder()
                     .name(category.getName())
                     .description(category.getDescription())
+                    .coverImage(category.getCoverImage())
                     .build();
             categoryRepository.save(categoryObj);
             return ResponseEntity.ok(ApiResponse.<CategoryResponse>builder()
@@ -82,6 +84,7 @@ public class CategoryServiceImp implements CategoryService {
                           .id(categoryOptional.get().getId())
                           .name(categoryOptional.get().getName())
                           .description(categoryOptional.get().getDescription())
+                          .coverImage(categoryOptional.get().getCoverImage())
                           .build();
                   res.setMessage("fetch data successful!");
                   res.setStatus(true);
@@ -109,12 +112,14 @@ public class CategoryServiceImp implements CategoryService {
                         .id(categoryOptional.get().getId())
                         .name(categoryRequest.getName())
                         .description(categoryRequest.getDescription())
+                        .coverImage(categoryRequest.getCoverImage())
                         .build();
                 categoryRepository.save(category);
                 CategoryResponse categoryResponse = CategoryResponse.builder()
                         .id(category.getId())
                         .name(category.getName())
                         .description(category.getDescription())
+                        .coverImage(category.getCoverImage())
                         .build();
                 res.setMessage("fetch data successful!");
                 res.setStatus(true);
@@ -141,6 +146,7 @@ public class CategoryServiceImp implements CategoryService {
                         .id(categoryOptional.get().getId())
                         .name(categoryOptional.get().getName())
                         .description(categoryOptional.get().getDescription())
+                        .coverImage(categoryOptional.get().getCoverImage())
                         .deleted(true)
                         .build();
                 categoryRepository.save(category);
@@ -148,6 +154,7 @@ public class CategoryServiceImp implements CategoryService {
                         .id(category.getId())
                         .name(category.getName())
                         .description(category.getDescription())
+                        .coverImage(category.getCoverImage())
                         .build();
                 res.setMessage("delete data successful!");
                 res.setStatus(true);

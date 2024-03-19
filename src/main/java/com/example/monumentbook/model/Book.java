@@ -45,7 +45,9 @@ public class Book {
                 this.coverImg,
                 this.isbn,
                 this.publisher,
-                this.publishDate
+                this.publishDate,
+                this.getQty(),
+                this.getPrice()
         );
     }
 
