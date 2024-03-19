@@ -40,9 +40,8 @@ public class SecurityConfiguration {
                                         "api/v1/category/*",
                                         "api/v1/image/*",
                                         "api/v1/author/**",
-                                        "/api/v1/book/*",
+                                        "/api/v1/book/**",
                                         "/api/v1/order/*",
-
                                         "/api/v1/bookmarks/*",
                                         "/api/v1/cart/*"
                                         )

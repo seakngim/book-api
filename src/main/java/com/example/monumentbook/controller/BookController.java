@@ -28,8 +28,8 @@ public class BookController {
     public ResponseEntity<?> getBook(@RequestParam(defaultValue = "1") Integer page,@RequestParam(defaultValue = "10") Integer size){
         return bookService.findAllBook(page,size);
     }
-    @GetMapping("/getById/{id}")
-    public ResponseEntity<?> getBookById(@RequestParam(required = true) Integer id){
+    @GetMapping("/getById")
+    public ResponseEntity<?> getBookById(@Param("book id") Integer id){
         return bookService.findBookById(id);
     }
     @PostMapping("/add")
@@ -38,12 +38,12 @@ public class BookController {
         return bookService.saveBook(book);
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("/update")
     @Operation(summary = "Update book")
     public ResponseEntity<?> updateBookById(@Param("book id") Integer id,@RequestBody BookRequest bookRequest){
         return bookService.updateBook(bookRequest,id);
     }
-    @DeleteMapping("/deleteById/{id}")
+    @DeleteMapping("/deleteById")
     @Operation(summary = "delete book")
     public  ResponseEntity<?> deleteBookById(@Param("book id") Integer id){
         return  bookService.DeleteById(id);
