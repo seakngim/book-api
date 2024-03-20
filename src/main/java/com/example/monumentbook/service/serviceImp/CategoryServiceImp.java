@@ -17,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,6 +64,7 @@ public class CategoryServiceImp implements CategoryService {
                     .name(category.getName())
                     .description(category.getDescription())
                     .coverImage(category.getCoverImage())
+                    .date(LocalDate.now())
                     .build();
             categoryRepository.save(categoryObj);
             return ResponseEntity.ok(ApiResponse.<CategoryResponse>builder()
@@ -85,6 +88,7 @@ public class CategoryServiceImp implements CategoryService {
                           .name(categoryOptional.get().getName())
                           .description(categoryOptional.get().getDescription())
                           .coverImage(categoryOptional.get().getCoverImage())
+                          .date(categoryOptional.get().getDate())
                           .build();
                   res.setMessage("fetch data successful!");
                   res.setStatus(true);
@@ -113,6 +117,7 @@ public class CategoryServiceImp implements CategoryService {
                         .name(categoryRequest.getName())
                         .description(categoryRequest.getDescription())
                         .coverImage(categoryRequest.getCoverImage())
+                        .date(categoryOptional.get().getDate())
                         .build();
                 categoryRepository.save(category);
                 CategoryResponse categoryResponse = CategoryResponse.builder()
@@ -120,6 +125,7 @@ public class CategoryServiceImp implements CategoryService {
                         .name(category.getName())
                         .description(category.getDescription())
                         .coverImage(category.getCoverImage())
+                        .date(category.getDate())
                         .build();
                 res.setMessage("fetch data successful!");
                 res.setStatus(true);
@@ -148,6 +154,7 @@ public class CategoryServiceImp implements CategoryService {
                         .description(categoryOptional.get().getDescription())
                         .coverImage(categoryOptional.get().getCoverImage())
                         .deleted(true)
+                        .date(categoryOptional.get().getDate())
                         .build();
                 categoryRepository.save(category);
                 CategoryResponse categoryResponse = CategoryResponse.builder()
@@ -155,6 +162,7 @@ public class CategoryServiceImp implements CategoryService {
                         .name(category.getName())
                         .description(category.getDescription())
                         .coverImage(category.getCoverImage())
+                        .date(category.getDate())
                         .build();
                 res.setMessage("delete data successful!");
                 res.setStatus(true);

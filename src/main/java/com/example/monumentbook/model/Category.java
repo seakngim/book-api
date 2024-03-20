@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +25,7 @@ public class Category {
     private String description;
     private String coverImage;
     private boolean deleted;
+    private LocalDate date;
     public CategoryDto toDto(){
         return  new CategoryDto(this.id,this.name, this.description, this.coverImage);
     }
