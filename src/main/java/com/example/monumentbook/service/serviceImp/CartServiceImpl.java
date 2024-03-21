@@ -206,37 +206,30 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseEntity<?> deleteCartById(Integer id) {
-        ResponseObject res= new ResponseObject();
+        ResponseObject res = new ResponseObject();
         try {
-            Optional<User> user = userRepository.findById(id);
-            UserDto userDto= null;
-            if (user.isPresent()){
-                userDto = buildUserDto(user.get());
+            Optional<Cart> cartOptional = cartRepository.findById(id);
+            if (cartOptional.isPresent()) {
+                Cart cart = cartOptional.get();
+                cartRepository.delete(cart);
+                res.setMessage("Deleted cart with id " + id);
+                res.setStatus(true);
+                res.setData(null);
+                return ResponseEntity.ok(res);
+            } else {
+                res.setMessage("Cart with id " + id + " not found");
+                res.setStatus(false);
+                res.setData(null);
+                return ResponseEntity.notFound().build();
             }
-            Optional<Book> book = bookRepository.findById(id);
-            BookDto bookDto= null;
-            if (book.isPresent()){
-                bookDto =buildBookDto(book.get());
-            }
-            Cart cart = Cart.builder()
-                    .id(id)
-                    .userId(user.get())
-                    .bookId(book.get())
-                    .qty(book.get().getQty())
-                    .deleted(true)
-                    .build();
-            cartRepository.save(cart);
-            res.setMessage("delete successful cart id" + cart.getId());
-            res.setStatus(true);
-            res.setData(null);
-            return ResponseEntity.ok(res);
-        }catch (Exception e){
-            res.setMessage("add false!");
-            res.setStatus(true);
-            res.setData(null);
+        } catch (Exception e) {
+            res.setMessage("Failed to delete cart with id " + id);
+            res.setStatus(false);
+            res.setData(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }
+
 
     @Override
     public ResponseEntity<?> findCartByUser(Integer page, Integer size) {
