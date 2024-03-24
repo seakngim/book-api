@@ -2,6 +2,7 @@ package com.example.monumentbook.controller;
 
 import com.example.monumentbook.model.requests.CartRequest;
 import com.example.monumentbook.model.requests.CartUpdateRequest;
+import com.example.monumentbook.model.requests.RequestById;
 import com.example.monumentbook.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,8 +35,8 @@ public class CartController {
     }
     @DeleteMapping("/delete")
     @Operation(summary = "delete cart by id")
-    public ResponseEntity<?> delete(@Param("cart id INTEGER") Integer id){
-       return cartService.deleteCartById(id);
+    public ResponseEntity<?> delete(@RequestBody RequestById requestById){
+       return cartService.deleteCartById(requestById);
     }
     @PutMapping("/update")
     @Operation(summary = "Update cart by id")

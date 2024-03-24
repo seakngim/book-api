@@ -8,6 +8,7 @@ import com.example.monumentbook.model.dto.CartDto;
 import com.example.monumentbook.model.dto.UserDto;
 import com.example.monumentbook.model.requests.CartRequest;
 import com.example.monumentbook.model.requests.CartUpdateRequest;
+import com.example.monumentbook.model.requests.RequestById;
 import com.example.monumentbook.model.responses.ApiResponse;
 import com.example.monumentbook.model.responses.CartResponse;
 import com.example.monumentbook.repository.BookRepository;
@@ -205,30 +206,31 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> deleteCartById(Integer id) {
+    public ResponseEntity<?> deleteCartById(RequestById request) {
         ResponseObject res = new ResponseObject();
         try {
-            Optional<Cart> cartOptional = cartRepository.findById(id);
-            if (cartOptional.isPresent()) {
-                Cart cart = cartOptional.get();
-                cartRepository.delete(cart);
-                res.setMessage("Deleted cart with id " + id);
+            List<Integer> ids = request.getIdList();
+            List<Cart> cartsToDelete = cartRepository.findAllById(ids);
+            if (!cartsToDelete.isEmpty()) {
+                cartRepository.deleteAll(cartsToDelete);
+                res.setMessage("Deleted carts with IDs: " + ids);
                 res.setStatus(true);
                 res.setData(null);
                 return ResponseEntity.ok(res);
             } else {
-                res.setMessage("Cart with id " + id + " not found");
+                res.setMessage("Carts with provided IDs not found");
                 res.setStatus(false);
                 res.setData(null);
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            res.setMessage("Failed to delete cart with id " + id);
+            res.setMessage("Failed to delete carts");
             res.setStatus(false);
-            res.setData(e);
+            res.setData(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }
+
 
 
     @Override

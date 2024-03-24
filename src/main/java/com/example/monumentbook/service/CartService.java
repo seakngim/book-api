@@ -2,6 +2,7 @@ package com.example.monumentbook.service;
 
 import com.example.monumentbook.model.requests.CartRequest;
 import com.example.monumentbook.model.requests.CartUpdateRequest;
+import com.example.monumentbook.model.requests.RequestById;
 import org.springframework.http.ResponseEntity;
 
 public interface CartService {
@@ -9,6 +10,6 @@ public interface CartService {
     ResponseEntity<?> getCart(Integer page, Integer size);
     ResponseEntity<?> getCartById(Integer id);
     ResponseEntity<?> updateCartById(Integer id, CartUpdateRequest cartRequest);
-    ResponseEntity<?> deleteCartById(Integer id);
+    ResponseEntity<?> deleteCartById(RequestById requestById);
     ResponseEntity<?> findCartByUser(Integer page, Integer size);
 }

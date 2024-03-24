@@ -39,10 +39,11 @@ public class BookServiceImp implements BookService {
     private final BookCategoryRepository bookCategoryRepository;
     private final VendorRepository vendorRepository;
     private final OrderRepository customerRepository;
+    private final CartRepository cartRepository;
 
     ResponseObject res = new ResponseObject();
 
-    public BookServiceImp(BookRepository bookRepository, AuthorRepository authorRepository, CategoryRepository categoryRepository, AuthorBookRepository authorBookRepository, BookCategoryRepository bookCategoryRepository, VendorRepository vendorRepository, OrderRepository customerRepository) {
+    public BookServiceImp(BookRepository bookRepository, AuthorRepository authorRepository, CategoryRepository categoryRepository, AuthorBookRepository authorBookRepository, BookCategoryRepository bookCategoryRepository, VendorRepository vendorRepository, OrderRepository customerRepository, CartRepository cartRepository) {
 
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
@@ -51,6 +52,7 @@ public class BookServiceImp implements BookService {
         this.bookCategoryRepository = bookCategoryRepository;
         this.vendorRepository = vendorRepository;
         this.customerRepository = customerRepository;
+        this.cartRepository = cartRepository;
     }
 
     @Override
@@ -469,7 +471,6 @@ public class BookServiceImp implements BookService {
             ResponseEntity<?> response = processCustomerRequest(currentUser, customerRequest);
             responses.add(response.getBody()); // Add the response body to the list
         }
-
         return ResponseEntity.ok(responses); // Return the list of responses
     }
 
@@ -495,8 +496,28 @@ public class BookServiceImp implements BookService {
                             .date(LocalDate.now())
                             .build();
                     customerRepository.save(customerOrder);
+                    try {
+                        Optional<Cart> cartOptional = cartRepository.findById(id);
+                        if (cartOptional.isPresent()) {
+                            Cart cart = cartOptional.get();
+                            cartRepository.delete(cart);
+                            res.setMessage("Deleted cart with id " + id);
+                            res.setStatus(true);
+                            res.setData(null);
+                            return ResponseEntity.ok(res);
+                        } else {
+                            res.setMessage("Cart with id " + id + " not found");
+                            res.setStatus(false);
+                            res.setData(null);
+                            return ResponseEntity.notFound().build();
+                        }
+                    } catch (Exception e) {
+                        res.setMessage("Failed to delete cart with id " + id);
+                        res.setStatus(false);
+                        res.setData(e);
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+                    }
 
-                    return ResponseEntity.ok(customerOrder); // Return success response
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requested quantity exceeds available quantity");
                 }
