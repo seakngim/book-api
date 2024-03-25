@@ -665,6 +665,7 @@ public class BookServiceImp implements BookService {
     public ResponseEntity<?> deleteNewArrival(RequestById requestById) {
         return BookFlags(requestById, "newArrival", false);
     }
+
     @Override
     public ResponseEntity<?> addBookOfTheWeek(RequestById requestById) {
         return BookFlags(requestById, "ofTheWeek", true);

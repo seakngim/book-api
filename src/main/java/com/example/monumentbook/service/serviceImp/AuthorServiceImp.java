@@ -306,6 +306,10 @@ public class AuthorServiceImp implements AuthorService {
                         .isbn(bookOptional.get().getIsbn())
                         .coverImg(bookOptional.get().getCoverImg())
                         .description(bookOptional.get().getDescription())
+                        .price(bookOptional.get().getPrice())
+                        .qty(bookOptional.get().getQty())
+                        .publishDate(bookOptional.get().getPublishDate())
+                        .publisher(bookOptional.get().getPublisher())
                         .build();
                 authorBooks.add(book);
             }

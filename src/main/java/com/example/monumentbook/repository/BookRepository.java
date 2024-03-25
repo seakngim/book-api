@@ -19,4 +19,5 @@ public interface BookRepository extends JpaRepository<Book,Integer> {
     Page<Book> findByDeleteFalseAndBestSellTrue(Pageable pageable);
     Page<Book> findByDeleteFalseAndNewArrivalTrue(Pageable pageable);
 
+
 }

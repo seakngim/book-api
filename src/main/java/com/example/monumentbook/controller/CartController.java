@@ -33,7 +33,7 @@ public class CartController {
     public ResponseEntity<?> getById(@Param("cart id INTEGER") Integer id){
         return cartService.getCartById(id);
     }
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     @Operation(summary = "delete cart by id")
     public ResponseEntity<?> delete(@RequestBody RequestById requestById){
        return cartService.deleteCartById(requestById);

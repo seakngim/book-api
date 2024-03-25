@@ -1,11 +1,12 @@
 package com.example.monumentbook.service.serviceImp;
 
-import com.example.monumentbook.model.Book;
-import com.example.monumentbook.model.BookCategory;
-import com.example.monumentbook.model.Category;
+import com.example.monumentbook.model.*;
+import com.example.monumentbook.model.dto.BookDto;
 import com.example.monumentbook.model.requests.CategoryRequest;
 import com.example.monumentbook.model.responses.ApiResponse;
 import com.example.monumentbook.model.responses.CategoryResponse;
+import com.example.monumentbook.repository.BookCategoryRepository;
+import com.example.monumentbook.repository.BookRepository;
 import com.example.monumentbook.repository.CategoryRepository;
 import com.example.monumentbook.service.CategoryService;
 import com.example.monumentbook.utilities.response.ResponseObject;
@@ -26,9 +27,14 @@ import java.util.Optional;
 @Service
 public class CategoryServiceImp implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final BookCategoryRepository bookCategoryRepository;
+    private final BookRepository bookRepository;
 
-    public CategoryServiceImp(CategoryRepository categoryRepository) {
+
+    public CategoryServiceImp(CategoryRepository categoryRepository, BookRepository bookRepository, BookCategoryRepository bookCategoryRepository, BookRepository bookRepository1) {
         this.categoryRepository = categoryRepository;
+        this.bookCategoryRepository = bookCategoryRepository;
+        this.bookRepository = bookRepository1;
     }
 
     @Override
@@ -38,11 +44,14 @@ public class CategoryServiceImp implements CategoryService {
             Page<Category> pageResult = categoryRepository.findByDeletedFalse(pageable);
             List<CategoryResponse> categoryResponseList = new ArrayList<>();
             for(Category bookCategory : pageResult.getContent()){
+                List<BookDto> books = bookFlags(bookCategory);
                 CategoryResponse categoryResponse = CategoryResponse.builder()
                         .id(bookCategory.getId())
                         .name(bookCategory.getName())
                         .description(bookCategory.getDescription())
                         .coverImage(bookCategory.getCoverImage())
+                        .books(books)
+                        .date(bookCategory.getDate())
                         .build();
                 categoryResponseList.add(categoryResponse);
             }
@@ -83,12 +92,14 @@ public class CategoryServiceImp implements CategoryService {
             Optional<Category> categoryOptional = categoryRepository.findById(id);
             ResponseObject res = new ResponseObject();
               if (categoryOptional.isPresent()){
+                  List<BookDto> books = bookFlags(categoryOptional.get());
                   CategoryResponse categoryResponse = CategoryResponse.builder()
                           .id(categoryOptional.get().getId())
                           .name(categoryOptional.get().getName())
                           .description(categoryOptional.get().getDescription())
                           .coverImage(categoryOptional.get().getCoverImage())
                           .date(categoryOptional.get().getDate())
+                          .books(books)
                           .build();
                   res.setMessage("fetch data successful!");
                   res.setStatus(true);
@@ -178,5 +189,26 @@ public class CategoryServiceImp implements CategoryService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(res);
         }
+    }
+    private  List<BookDto> bookFlags(Category category){
+        List<BookCategory> bookCategoryList = bookCategoryRepository.findAllByCategory(category);
+        List<BookDto> authorBooks = new ArrayList<>();
+        for(BookCategory bookCategory : bookCategoryList){
+            Optional<Book> bookOptional = bookRepository.findById(bookCategory.getBook().getId());
+            if(bookOptional.isPresent()){
+                BookDto book = BookDto.builder()
+                        .id(bookOptional.get().getId())
+                        .title(bookOptional.get().getTitle())
+                        .isbn(bookOptional.get().getIsbn())
+                        .coverImg(bookOptional.get().getCoverImg())
+                        .description(bookOptional.get().getDescription()).price(bookOptional.get().getPrice())
+                        .qty(bookOptional.get().getQty())
+                        .publishDate(bookOptional.get().getPublishDate())
+                        .publisher(bookOptional.get().getPublisher())
+                        .build();
+                authorBooks.add(book);
+            }
+        }
+        return authorBooks;
     }
 }
