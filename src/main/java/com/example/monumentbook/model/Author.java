@@ -19,12 +19,14 @@ public class Author {
     @Column(name = "author_id")
     private Integer id;
     private String name;
+    @Column(length = 3000)
     private String description;
     private String image;
     private LocalDate date;
     @Column(name = "deleted")
     private boolean deleted = false;
     private boolean status;
+    @Column(length = 1000)
     private String quote;
 
 public AuthorDto toDto(){

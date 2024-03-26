@@ -22,6 +22,7 @@ public class Category {
     @Column(name = "id")
     private Integer id;
     private String name;
+    @Column(length = 2000)
     private String description;
     private String coverImage;
     private boolean deleted;

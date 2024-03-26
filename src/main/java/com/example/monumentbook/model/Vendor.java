@@ -16,7 +16,9 @@ public class Vendor {
     @Column(name = "vendor_id")
     private Integer id;
     private int price;
+    private Integer book_id;
     private int qty;
     private String name;
     private LocalDate date;
+    private boolean deleted;
 }

@@ -105,4 +105,20 @@ public class BookController {
     public ResponseEntity<?> deleteNewArrival(@RequestBody RequestById bookIds){
         return bookService.deleteNewArrival(bookIds);
     }
+    @GetMapping("/getAllImport")
+    @Operation(summary = "get all vendor")
+    public ResponseEntity<?> getAllImport(@RequestParam(defaultValue = "1") Integer page,@RequestParam(defaultValue = "10") Integer size){
+        return bookService.getAllImportProduct(page, size);
+    }
+    @DeleteMapping("/deleteImport")
+    @Operation(summary = "delete import by vendor id")
+    public ResponseEntity<?> deleteImport(@Param(value = "vendor id")Integer id){
+        return bookService.deleteImport(id);
+    }
+    @PutMapping("/deleteImport")
+    @Operation(summary = "update import by vendor id")
+    public ResponseEntity<?> UpdateImport(@Param(value = "vendor id")Integer id,@Param(value = "vendor book_id")Integer book_id , @RequestBody ProductRequest productRequest ){
+        return bookService.updateImport(id,book_id,productRequest);
+    }
+
 }

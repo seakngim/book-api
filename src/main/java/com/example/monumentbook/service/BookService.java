@@ -26,5 +26,7 @@ public interface BookService {
     ResponseEntity<?> deleteBookOfTheWeek(RequestById requestById);
     ResponseEntity<?> deleteBestSell(RequestById requestById);
     ResponseEntity<?> deleteNewArrival(RequestById requestById);
-
+    ResponseEntity<?> getAllImportProduct(Integer page, Integer size);
+    ResponseEntity<?> deleteImport(Integer id);
+    ResponseEntity<?> updateImport(Integer id,Integer book_id,ProductRequest productRequest);
 }

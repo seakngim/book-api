@@ -20,7 +20,7 @@ public class Book {
     @Column(name = "id")
     private Integer id;
     private String title;
-    @Column(length = 2000)
+    @Column(length = 3000)
     private String description;
     @Column(unique = true)
     private String isbn;

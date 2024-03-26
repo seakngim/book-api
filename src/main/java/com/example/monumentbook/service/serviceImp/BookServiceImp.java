@@ -10,6 +10,7 @@ import com.example.monumentbook.model.requests.ProductRequest;
 import com.example.monumentbook.model.requests.RequestById;
 import com.example.monumentbook.model.responses.ApiResponse;
 import com.example.monumentbook.model.responses.BookResponse;
+import com.example.monumentbook.model.responses.VendorResponse;
 import com.example.monumentbook.repository.*;
 import com.example.monumentbook.service.BookService;
 import com.example.monumentbook.utilities.response.ResponseObject;
@@ -437,6 +438,7 @@ public class BookServiceImp implements BookService {
                         .name(productRequest.getVendor())
                         .qty(productRequest.getQty())
                         .date(LocalDate.now())
+                        .book_id(bookOptional.get().getId())
                         .build();
                 vendorRepository.save(vendor);
                 res.setStatus(true);
@@ -542,7 +544,6 @@ public class BookServiceImp implements BookService {
                 if (bookOptional.isPresent()) {
                     List<CategoryDto> categoryObj = getCategoriesByBookId(bookOptional.get());
                     List<AuthorDto> authorObj = getAuthorsByBookId(bookOptional.get());
-
                     BookResponse bookResponse = createBookResponse(bookOptional.get(), categoryObj, authorObj);
                     bookObj.add(bookResponse);
                 }
@@ -664,6 +665,146 @@ public class BookServiceImp implements BookService {
     @Override
     public ResponseEntity<?> deleteNewArrival(RequestById requestById) {
         return BookFlags(requestById, "newArrival", false);
+    }
+
+    @Override
+    public ResponseEntity<?> getAllImportProduct(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
+        Page<Vendor> pageResult = vendorRepository.findByDeletedFalse(pageable);
+        List<VendorResponse> vendorList = new ArrayList<>();
+        for(Vendor vendor : pageResult){
+            Optional<Vendor> vendorOptional = vendorRepository.findById(vendor.getId());
+            if (vendorOptional.isPresent()){
+                Optional<Book> bookOptional = bookRepository.findById(vendorOptional.get().getBook_id());
+                if (bookOptional.isPresent()){
+                    BookDto bookDto = BookDto.builder()
+                            .id(bookOptional.get().getId())
+                            .qty(bookOptional.get().getQty())
+                            .description(bookOptional.get().getDescription())
+                            .price(bookOptional.get().getPrice())
+                            .coverImg(bookOptional.get().getCoverImg())
+                            .isbn(bookOptional.get().getIsbn())
+                            .title(bookOptional.get().getTitle())
+                            .build();
+                    VendorResponse vendorResponse = VendorResponse.builder()
+                            .id(vendorOptional.get().getId())
+                            .price(vendorOptional.get().getPrice())
+                            .qty(vendorOptional.get().getQty())
+                            .name(vendorOptional.get().getName())
+                            .date(vendorOptional.get().getDate())
+                            .book(bookDto)
+                            .build();
+                    vendorList.add(vendorResponse);
+                }
+
+
+            }
+
+        }
+        ApiResponse res = new ApiResponse(true, "Fetch books successful!", vendorList, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getContent().size());
+        return ResponseEntity.ok(res);
+    }
+
+    @Override
+    public ResponseEntity<?> deleteImport(Integer id) {
+        try {
+            Optional<Vendor> vendor = vendorRepository.findByIdAndDeletedFalse(id);
+            System.out.println(vendor);
+            if (vendor.isPresent()) {
+                Optional<Book> bookOptional = bookRepository.findById(vendor.get().getBook_id());
+                if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
+                    Book book = Book.builder()
+                            .id(bookOptional.get().getId())
+                            .isbn(bookOptional.get().getIsbn())
+                            .title(bookOptional.get().getTitle())
+                            .description(bookOptional.get().getDescription())
+                            .coverImg(bookOptional.get().getCoverImg())
+                            .publisher(bookOptional.get().getPublisher())
+                            .publishDate(bookOptional.get().getPublishDate())
+                            .price(bookOptional.get().getPrice())
+                            .qty(bookOptional.get().getQty() - vendor.get().getQty())
+                            .delete(bookOptional.get().isDelete())
+                            .bestSell(bookOptional.get().isBestSell())
+                            .newArrival(bookOptional.get().isNewArrival())
+                            .ofTheWeek(bookOptional.get().isOfTheWeek())
+                            .build();
+                    bookRepository.save(book);
+                    Vendor vendorObj = Vendor.builder()
+                            .id(vendor.get().getId())
+                            .price(vendor.get().getPrice())
+                            .name(vendor.get().getName())
+                            .qty(vendor.get().getQty())
+                            .date(LocalDate.now())
+                            .book_id(vendor.get().getBook_id())
+                            .deleted(true)
+                            .build();
+                    vendorRepository.save(vendorObj);
+                    res.setStatus(true);
+                    res.setMessage("add success!");
+                    res.setData(vendor);
+                    return ResponseEntity.ok(res);
+                } else {
+                    res.setStatus(false);
+                    res.setMessage("add false!");
+                    res.setData(null);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+                }
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id not found");
+
+    }
+
+    @Override
+    public ResponseEntity<?> updateImport(Integer id,Integer book_id, ProductRequest productRequest) {
+        try {
+            Optional<Vendor> vendor = vendorRepository.findByIdAndDeletedFalse(id);
+            System.out.println(vendor);
+            if (vendor.isPresent()) {
+                Optional<Book> bookOptional = bookRepository.findById(book_id);
+                if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
+                    Book book = Book.builder()
+                            .id(bookOptional.get().getId())
+                            .isbn(bookOptional.get().getIsbn())
+                            .title(bookOptional.get().getTitle())
+                            .description(bookOptional.get().getDescription())
+                            .coverImg(bookOptional.get().getCoverImg())
+                            .publisher(bookOptional.get().getPublisher())
+                            .publishDate(bookOptional.get().getPublishDate())
+                            .price(bookOptional.get().getPrice())
+                            .qty(bookOptional.get().getQty() - vendor.get().getQty() +productRequest.getQty())
+                            .delete(bookOptional.get().isDelete())
+                            .bestSell(bookOptional.get().isBestSell())
+                            .newArrival(bookOptional.get().isNewArrival())
+                            .ofTheWeek(bookOptional.get().isOfTheWeek())
+                            .build();
+                    bookRepository.save(book);
+                    Vendor vendorObj = Vendor.builder()
+                            .id(vendor.get().getId())
+                            .price(productRequest.getCost())
+                            .name(productRequest.getVendor())
+                            .qty(productRequest.getQty())
+                            .date(vendor.get().getDate())
+                            .book_id(bookOptional.get().getId())
+                            .build();
+                    vendorRepository.save(vendorObj);
+                    res.setStatus(true);
+                    res.setMessage("add success!");
+                    res.setData(vendor);
+                    return ResponseEntity.ok(res);
+                } else {
+                    res.setStatus(false);
+                    res.setMessage("add false!");
+                    res.setData(null);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+                }
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id not found");
     }
 
     @Override
