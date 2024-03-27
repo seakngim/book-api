@@ -2,6 +2,7 @@ package com.example.monumentbook.model.responses;
 
 import com.example.monumentbook.model.dto.AuthorDto;
 import com.example.monumentbook.model.dto.CategoryDto;
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -23,6 +24,10 @@ public class BookResponse {
         private String publisher;
         private int qty;
         private int price;
+        private boolean delete;
+        private boolean ofTheWeek;
+        private boolean bestSell;
+        private boolean newArrival;
         private LocalDate publishDate;
         private List<CategoryDto> categories;
         private List<AuthorDto> author;
