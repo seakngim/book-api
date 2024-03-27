@@ -29,4 +29,5 @@ public interface BookService {
     ResponseEntity<?> getAllImportProduct(Integer page, Integer size);
     ResponseEntity<?> deleteImport(Integer id);
     ResponseEntity<?> updateImport(Integer id,Integer book_id,ProductRequest productRequest);
+    ResponseEntity<?> getImportProductById(Integer id);
 }

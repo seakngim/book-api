@@ -115,10 +115,15 @@ public class BookController {
     public ResponseEntity<?> deleteImport(@Param(value = "vendor id")Integer id){
         return bookService.deleteImport(id);
     }
-    @PutMapping("/deleteImport")
+    @PutMapping("/updateImport")
     @Operation(summary = "update import by vendor id")
     public ResponseEntity<?> UpdateImport(@Param(value = "vendor id")Integer id,@Param(value = "vendor book_id")Integer book_id , @RequestBody ProductRequest productRequest ){
         return bookService.updateImport(id,book_id,productRequest);
+    }
+    @GetMapping("/getImportById")
+    @Operation(summary = "get import vendor by id")
+    public ResponseEntity<?> getImportById(@Param("import vendor id") Integer id){
+        return bookService.getImportProductById(id);
     }
 
 }

@@ -808,6 +808,44 @@ public class BookServiceImp implements BookService {
     }
 
     @Override
+    public ResponseEntity<?> getImportProductById(Integer id) {
+        try {
+            Optional<Vendor> vendorOptional = vendorRepository.findById(id);
+            if (vendorOptional.isPresent()){
+                Optional<Book> bookOptional = bookRepository.findById(vendorOptional.get().getBook_id());
+                if (bookOptional.isPresent()) {
+                    BookDto bookDto = BookDto.builder()
+                            .id(bookOptional.get().getId())
+                            .qty(bookOptional.get().getQty())
+                            .description(bookOptional.get().getDescription())
+                            .price(bookOptional.get().getPrice())
+                            .coverImg(bookOptional.get().getCoverImg())
+                            .isbn(bookOptional.get().getIsbn())
+                            .title(bookOptional.get().getTitle())
+                            .build();
+                    VendorResponse vendorResponse = VendorResponse.builder()
+                            .id(vendorOptional.get().getId())
+                            .price(vendorOptional.get().getPrice())
+                            .qty(vendorOptional.get().getQty())
+                            .name(vendorOptional.get().getName())
+                            .date(vendorOptional.get().getDate())
+                            .book(bookDto)
+                            .build();
+                    res.setData(vendorResponse);
+                    res.setStatus(true);
+                    res.setMessage("get import by id successful!");
+                }
+            }
+            return ResponseEntity.ok(res);
+        }catch (Exception e){
+            res.setData(null);
+            res.setStatus(false);
+            res.setMessage("get import by id false!");
+            return ResponseEntity.ok(res);
+        }
+    }
+
+    @Override
     public ResponseEntity<?> addBookOfTheWeek(RequestById requestById) {
         return BookFlags(requestById, "ofTheWeek", true);
     }
