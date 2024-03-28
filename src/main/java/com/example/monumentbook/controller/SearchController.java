@@ -3,6 +3,7 @@ package com.example.monumentbook.controller;
 import com.example.monumentbook.service.SearchService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/search")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
-public class SearcherController {
+public class SearchController {
     private final SearchService searchService;
-    @GetMapping("searchBy")
-    public ResponseEntity<?> getCurrentUser(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size){
-        return searchService.search(page, size);
+    @GetMapping("/all")
+    public ResponseEntity<?> getCurrentUser(@Param("filter") String filter){
+        return searchService.search(filter);
     }
 }
