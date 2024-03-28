@@ -44,6 +44,7 @@ public class SecurityConfiguration {
                                         "/api/v1/order/*",
                                         "/api/v1/news/*",
                                         "/api/v1/bookmarks/*",
+                                        "/api/v1/search/**",
                                         "/api/v1/cart/*"
                                         )
                         .permitAll()

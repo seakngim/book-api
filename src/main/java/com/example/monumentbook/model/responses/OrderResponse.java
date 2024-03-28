@@ -1,5 +1,7 @@
 package com.example.monumentbook.model.responses;
 
+import com.example.monumentbook.model.dto.BookDto;
+import com.example.monumentbook.model.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,11 +14,8 @@ import java.time.LocalDate;
 @Builder
 public class OrderResponse {
     private Integer id;
-    private String customer_name;
-    private String phoneNumber;
-    private long customer_id;
-    private String product_name;
-    private Integer product_id;
+    private UserDto user;
+    private BookDto book;
     private int qty;
     private int price;
     private LocalDate date;

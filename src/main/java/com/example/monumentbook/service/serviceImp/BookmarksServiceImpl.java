@@ -105,27 +105,20 @@ public class BookmarksServiceImpl implements BookmarksService {
     public ResponseEntity<?> deleteCartById(Integer id) {
         ResponseObject res= new ResponseObject();
         try {
-            Optional<User> user = userRepository.findById(id);
-            UserDto userDto= null;
-            if (user.isPresent()){
-                userDto = buildUserDto(user.get());
-            }
-            Optional<Book> book = bookRepository.findById(id);
-            BookDto bookDto= null;
-            if (book.isPresent()){
-                bookDto =buildBookDto(book.get());
-            }
+            Optional<Bookmarks> bookmarksOptional = bookmarkRepository.findById(id);
+            if(bookmarksOptional.isPresent()){
             Bookmarks bookmarks = Bookmarks.builder()
                     .id(id)
-                    .userId(user.get())
-                    .bookId(book.get())
+                    .userId(bookmarksOptional.get().getUserId())
+                    .bookId(bookmarksOptional.get().getBookId())
+                    .date(bookmarksOptional.get().getDate())
                     .deleted(true)
                     .build();
             bookmarkRepository.save(bookmarks);
             res.setMessage("delete successful cart id" + bookmarks.getId());
             res.setStatus(true);
             res.setData(null);
-            return ResponseEntity.ok(res);
+            }return ResponseEntity.ok(res);
         }catch (Exception e){
             res.setMessage("add false!");
             res.setStatus(true);

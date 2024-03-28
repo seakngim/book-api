@@ -4,10 +4,7 @@ import com.example.monumentbook.service.OrderService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -17,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
     private final OrderService orderService;
     @GetMapping("/all")
-    public ResponseEntity<?> getAllOrder(){
-        return orderService.allCustomerOrder();
+    public ResponseEntity<?> getAllOrder(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size){
+        return orderService.allCustomerOrder(page, size);
     }
     @GetMapping("/current")
-    public ResponseEntity<?> getCurrentUser(){
-        return orderService.allCurrentOrder();
+    public ResponseEntity<?> getCurrentUser(@RequestParam(defaultValue = "1") Integer page,@RequestParam(defaultValue = "10") Integer size){
+        return orderService.allCurrentOrder(page, size);
     }
 }

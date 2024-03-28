@@ -488,11 +488,8 @@ public class BookServiceImp implements BookService {
                     book.setQty(availableQty - requestedQty);
                     bookRepository.save(book);
                     CustomerOrder customerOrder = CustomerOrder.builder()
-                            .customerId(currentUser.getId())
-                            .customerName(currentUser.getUsername())
-                            .phoneNumber(currentUser.getPhoneNumber())
-                            .productId(id)
-                            .productName(book.getTitle())
+                            .bookId(bookOptional.get())
+                            .userId(currentUser)
                             .qty(requestedQty)
                             .price(book.getPrice())
                             .date(LocalDate.now())
@@ -521,7 +518,11 @@ public class BookServiceImp implements BookService {
                     }
 
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requested quantity exceeds available quantity");
+                    res.setMessage("Requested quantity exceeds available quantity");
+                    res.setStatus(false);
+                    res.setData(null);
+
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found or deleted");
@@ -844,6 +845,36 @@ public class BookServiceImp implements BookService {
             return ResponseEntity.ok(res);
         }
     }
+
+//    @Override
+//    public ResponseEntity<?> findBookBySearch(String keySearch) {
+//        try {
+////            Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
+////            Page<BookDto> pageResult = bookRepository.findByDeleteFalseAndNewArrivalTrue(pageable).map(Book::toDto);
+//            List<Book> books = bookRepository.findByDeleteFalseAndTitleOrDescriptionOrIsbn(keySearch);
+//            List<BookResponse> bookObj = new ArrayList<>();
+//            for (Book book : books) {
+//                Optional<Book> bookOptional = bookRepository.findById(book.getId());
+//                if (bookOptional.isPresent()) {
+//                    List<CategoryDto> categoryObj = getCategoriesByBookId(bookOptional.get());
+//                    List<AuthorDto> authorObj = getAuthorsByBookId(bookOptional.get());
+//
+//                    BookResponse bookResponse = createBookResponse(bookOptional.get(), categoryObj, authorObj);
+//                    bookObj.add(bookResponse);
+//                }
+//            }
+//            if (!bookObj.isEmpty()) {
+//                ApiResponse res = new ApiResponse(true, "Fetch books successful!", bookObj, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), bookObj.size());
+//                return ResponseEntity.ok(res);
+//            } else {
+//                ApiResponse res = new ApiResponse(false, "No books found!", null, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+//            }
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
 
     @Override
     public ResponseEntity<?> addBookOfTheWeek(RequestById requestById) {

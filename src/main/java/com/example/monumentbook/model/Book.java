@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -37,6 +38,7 @@ public class Book {
     private boolean bestSell;
     @Column(name = "new_arrival")
     private boolean newArrival;
+
     public BookDto toDto() {
         return new BookDto(
                 this.id,

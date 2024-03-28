@@ -18,16 +18,14 @@ public class CustomerOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "customer_name")
-    private String customerName;
-    private String phoneNumber;
-    @Column(name = "customer_id")
-    private long customerId;
-    @Column(name = "productName")
-    private String productName;
-    @Column(name = "productId")
-    private Integer productId;
+    @ManyToOne(fetch = FetchType.LAZY )
+    @JoinColumn(name = "userId")
+    private User userId;
+    @ManyToOne(fetch = FetchType.LAZY )
+    @JoinColumn(name = "bookId")
+    private Book bookId;
     private int qty;
     private int price;
     private LocalDate date;
+    private boolean deleted;
 }
