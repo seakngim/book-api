@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(name = "bookmarks_db")
 public class Bookmarks {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -23,7 +23,7 @@ public class BookResponse {
         private String isbn;
         private String publisher;
         private int qty;
-        private int price;
+        private float price;
         private boolean delete;
         private boolean ofTheWeek;
         private boolean bestSell;

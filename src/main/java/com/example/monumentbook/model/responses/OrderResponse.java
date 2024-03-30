@@ -17,6 +17,6 @@ public class OrderResponse {
     private UserDto user;
     private BookDto book;
     private int qty;
-    private int price;
+    private float price;
     private LocalDate date;
 }

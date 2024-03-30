@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 
 @Entity
-@Table(name = "ImageData")
+@Table(name = "imageData_db")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

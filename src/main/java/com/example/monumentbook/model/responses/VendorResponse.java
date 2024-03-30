@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Builder
 public class VendorResponse {
     private Integer id;
-    private int price;
+    private float cost;
     private BookDto book;
     private int qty;
     private String name;

@@ -25,7 +25,7 @@ public class CustomerOrder {
     @JoinColumn(name = "bookId")
     private Book bookId;
     private int qty;
-    private int price;
+    private float price;
     private LocalDate date;
     private boolean deleted;
 }

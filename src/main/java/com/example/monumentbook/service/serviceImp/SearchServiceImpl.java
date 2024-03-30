@@ -34,12 +34,11 @@ public class SearchServiceImpl implements SearchService {
             Object[] tupleArray = (Object[]) tuple;
             Integer id = (Integer) tupleArray[0];
             String title = (String) tupleArray[1];
-            int price = (int) tupleArray[2];
+            float price = (float) tupleArray[2];
             String description = (String) tupleArray[3];
             String cover_img = (String) tupleArray[4];
             String authorName = (String) tupleArray[5];
             String categoryName = (String) tupleArray[6];
-
             BookSearchResult result = new BookSearchResult();
             result.setId(id);
             result.setTitle(title);

@@ -17,5 +17,5 @@ public class BookDto {
     private String publisher;
     private LocalDate publishDate;
     private int qty;
-    private int price;
+    private float price;
 }

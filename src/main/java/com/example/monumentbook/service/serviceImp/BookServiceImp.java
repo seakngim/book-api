@@ -434,7 +434,7 @@ public class BookServiceImp implements BookService {
                         .build();
                 bookRepository.save(book);
                 Vendor vendor = Vendor.builder()
-                        .price(productRequest.getCost())
+                        .cost(productRequest.getCost())
                         .name(productRequest.getVendor())
                         .qty(productRequest.getQty())
                         .date(LocalDate.now())
@@ -689,7 +689,7 @@ public class BookServiceImp implements BookService {
                             .build();
                     VendorResponse vendorResponse = VendorResponse.builder()
                             .id(vendorOptional.get().getId())
-                            .price(vendorOptional.get().getPrice())
+                            .cost(vendorOptional.get().getCost())
                             .qty(vendorOptional.get().getQty())
                             .name(vendorOptional.get().getName())
                             .date(vendorOptional.get().getDate())
@@ -732,7 +732,7 @@ public class BookServiceImp implements BookService {
                     bookRepository.save(book);
                     Vendor vendorObj = Vendor.builder()
                             .id(vendor.get().getId())
-                            .price(vendor.get().getPrice())
+                            .cost(vendor.get().getCost())
                             .name(vendor.get().getName())
                             .qty(vendor.get().getQty())
                             .date(LocalDate.now())
@@ -784,7 +784,7 @@ public class BookServiceImp implements BookService {
                     bookRepository.save(book);
                     Vendor vendorObj = Vendor.builder()
                             .id(vendor.get().getId())
-                            .price(productRequest.getCost())
+                            .cost(productRequest.getCost())
                             .name(productRequest.getVendor())
                             .qty(productRequest.getQty())
                             .date(vendor.get().getDate())
@@ -826,7 +826,7 @@ public class BookServiceImp implements BookService {
                             .build();
                     VendorResponse vendorResponse = VendorResponse.builder()
                             .id(vendorOptional.get().getId())
-                            .price(vendorOptional.get().getPrice())
+                            .cost(vendorOptional.get().getCost())
                             .qty(vendorOptional.get().getQty())
                             .name(vendorOptional.get().getName())
                             .date(vendorOptional.get().getDate())

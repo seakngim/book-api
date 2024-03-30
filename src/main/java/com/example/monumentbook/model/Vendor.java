@@ -15,7 +15,7 @@ public class Vendor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vendor_id")
     private Integer id;
-    private int price;
+    private float cost;
     private Integer book_id;
     private int qty;
     private String name;

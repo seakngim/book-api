@@ -10,7 +10,7 @@ import lombok.*;
 public class BookSearchResult {
     private Integer id;
     private String title;
-    private int price;
+    private float price;
     private String description;
     private String coverImg ;
     private String authorName;

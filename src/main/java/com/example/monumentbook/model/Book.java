@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@Table(name = "_book")
+@Table(name = "book_db")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class Book {
     private String coverImg;
     private LocalDate publishDate;
     private int qty;
-    private int price;
+    private float price;
     @Column(name = "is_delete")
     private boolean delete;
     @Column(name = "of_the_week")
