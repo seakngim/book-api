@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "vendor_tb")
 public class Vendor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

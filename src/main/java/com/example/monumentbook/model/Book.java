@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@Table(name = "book_db")
+@Table(name = "book_tb")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

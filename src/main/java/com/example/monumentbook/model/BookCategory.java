@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@Table(name = "category_book_db")
+@Table(name = "category_book_tb")
 public class BookCategory {
 
     @Id

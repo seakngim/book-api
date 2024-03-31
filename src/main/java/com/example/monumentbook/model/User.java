@@ -19,7 +19,7 @@ import java.util.Collections;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "user_db")
+@Table(name = "user_tb")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

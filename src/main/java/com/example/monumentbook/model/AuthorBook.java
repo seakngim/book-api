@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@Table(name = "AuthorBook_db")
+@Table(name = "AuthorBook_tb")
 public class AuthorBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

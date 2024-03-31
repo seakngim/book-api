@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "cart_db")
+@Table(name = "cart_tb")
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
