@@ -60,10 +60,8 @@ public class BookServiceImp implements BookService {
     public ResponseEntity<?> findAllBook(Integer page, Integer size) {
         try {
             Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-            Page<BookDto> pageResult = bookRepository.findByDeleteFalse(pageable).map(Book::toDto);
-
+            Page<BookDto> pageResult = bookRepository.findByDeletedFalse(pageable).map(Book::toDto);
             List<BookResponse> bookObj = new ArrayList<>();
-
             for (BookDto bookDto : pageResult.getContent()) {
                 Optional<Book> bookOptional = bookRepository.findById(bookDto.getId());
                 if (bookOptional.isPresent()) {
@@ -290,7 +288,7 @@ public class BookServiceImp implements BookService {
                         .publishDate(bookRequest.getPublishDate())
                         .price(bookRequest.getPrice())
                         .qty(bookOptional.get().getQty())
-                        .delete(bookOptional.get().isDelete())
+                        .deleted(bookOptional.get().isDeleted())
                         .build();
                 bookRepository.save(book);
                 List<AuthorBook> authorBookList = new ArrayList<>();
@@ -384,7 +382,7 @@ public class BookServiceImp implements BookService {
     public ResponseEntity<?> DeleteById(Integer id) {
         try {
             Optional<Book> bookOptional = bookRepository.findById(id);
-            if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
+            if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
                 Book book = Book.builder()
                         .id(id)
                         .isbn(bookOptional.get().getIsbn())
@@ -393,13 +391,14 @@ public class BookServiceImp implements BookService {
                         .coverImg(bookOptional.get().getCoverImg())
                         .publisher(bookOptional.get().getPublisher())
                         .publishDate(bookOptional.get().getPublishDate())
-                        .delete(true)
+                        .deleted(true)
                         .build();
                 bookRepository.save(book);
                 res.setStatus(true);
                 res.setMessage("delete success!" + " id" + id);
                 res.setData(book);
                 return ResponseEntity.ok(res);
+
             } else {
                 res.setStatus(false);
                 res.setMessage("delete false!" + " id" + id);
@@ -416,7 +415,7 @@ public class BookServiceImp implements BookService {
 
         try {
             Optional<Book> bookOptional = bookRepository.findById(id);
-            if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
+            if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
                 Book book = Book.builder()
                         .id(bookOptional.get().getId())
                         .isbn(bookOptional.get().getIsbn())
@@ -427,7 +426,7 @@ public class BookServiceImp implements BookService {
                         .publishDate(bookOptional.get().getPublishDate())
                         .price(bookOptional.get().getPrice())
                         .qty(bookOptional.get().getQty() + productRequest.getQty())
-                        .delete(bookOptional.get().isDelete())
+                        .deleted(bookOptional.get().isDeleted())
                         .bestSell(bookOptional.get().isBestSell())
                         .newArrival(bookOptional.get().isNewArrival())
                         .ofTheWeek(bookOptional.get().isOfTheWeek())
@@ -480,7 +479,7 @@ public class BookServiceImp implements BookService {
         try {
             Integer id = customerRequest.getProductId();
             Optional<Book> bookOptional = bookRepository.findById(id);
-            if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
+            if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
                 Book book = bookOptional.get();
                 int requestedQty = customerRequest.getQty();
                 int availableQty = book.getQty();
@@ -538,7 +537,7 @@ public class BookServiceImp implements BookService {
     public ResponseEntity<?> getBookOfTheWeek(Integer page, Integer size) {
         try {
             Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-            Page<BookDto> pageResult = bookRepository.findByDeleteFalseAndOfTheWeekTrue(pageable).map(Book::toDto);
+            Page<BookDto> pageResult = bookRepository.findByDeletedFalseAndOfTheWeekTrue(pageable).map(Book::toDto);
             List<BookResponse> bookObj = new ArrayList<>();
             for (BookDto book : pageResult.getContent()) {
                 Optional<Book> bookOptional = bookRepository.findById(book.getId());
@@ -565,7 +564,7 @@ public class BookServiceImp implements BookService {
     public ResponseEntity<?> getBestSell(Integer page, Integer size) {
         try {
             Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-            Page<BookDto> pageResult = bookRepository.findByDeleteFalseAndBestSellTrue(pageable).map(Book::toDto);
+            Page<BookDto> pageResult = bookRepository.findByDeletedFalseAndBestSellTrue(pageable).map(Book::toDto);
             List<BookResponse> bookObj = new ArrayList<>();
             for (BookDto book : pageResult.getContent()) {
                 Optional<Book> bookOptional = bookRepository.findById(book.getId());
@@ -593,7 +592,7 @@ public class BookServiceImp implements BookService {
     public ResponseEntity<?> getNewArrival(Integer page, Integer size) {
         try {
             Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-            Page<BookDto> pageResult = bookRepository.findByDeleteFalseAndNewArrivalTrue(pageable).map(Book::toDto);
+            Page<BookDto> pageResult = bookRepository.findByDeletedFalseAndNewArrivalTrue(pageable).map(Book::toDto);
             List<BookResponse> bookObj = new ArrayList<>();
             for (BookDto book : pageResult.getContent()) {
                 Optional<Book> bookOptional = bookRepository.findById(book.getId());
@@ -624,7 +623,7 @@ public class BookServiceImp implements BookService {
             List<Book> updatedBooks = new ArrayList<>();
             for (Integer id : requestById.getIdList()) {
                 Optional<Book> bookOptional = bookRepository.findById(id);
-                if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
+                if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
                     Book updatedBook = updateField(bookOptional.get(), fieldName, status);
                     updatedBooks.add(updatedBook);
                 }
@@ -713,7 +712,7 @@ public class BookServiceImp implements BookService {
             System.out.println(vendor);
             if (vendor.isPresent()) {
                 Optional<Book> bookOptional = bookRepository.findById(vendor.get().getBook_id());
-                if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
+                if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
                     Book book = Book.builder()
                             .id(bookOptional.get().getId())
                             .isbn(bookOptional.get().getIsbn())
@@ -724,7 +723,7 @@ public class BookServiceImp implements BookService {
                             .publishDate(bookOptional.get().getPublishDate())
                             .price(bookOptional.get().getPrice())
                             .qty(bookOptional.get().getQty() - vendor.get().getQty())
-                            .delete(bookOptional.get().isDelete())
+                            .deleted(bookOptional.get().isDeleted())
                             .bestSell(bookOptional.get().isBestSell())
                             .newArrival(bookOptional.get().isNewArrival())
                             .ofTheWeek(bookOptional.get().isOfTheWeek())
@@ -765,7 +764,7 @@ public class BookServiceImp implements BookService {
             System.out.println(vendor);
             if (vendor.isPresent()) {
                 Optional<Book> bookOptional = bookRepository.findById(book_id);
-                if (bookOptional.isPresent() && !bookOptional.get().isDelete()) {
+                if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
                     Book book = Book.builder()
                             .id(bookOptional.get().getId())
                             .isbn(bookOptional.get().getIsbn())
@@ -776,7 +775,7 @@ public class BookServiceImp implements BookService {
                             .publishDate(bookOptional.get().getPublishDate())
                             .price(bookOptional.get().getPrice())
                             .qty(bookOptional.get().getQty() - vendor.get().getQty() +productRequest.getQty())
-                            .delete(bookOptional.get().isDelete())
+                            .deleted(bookOptional.get().isDeleted())
                             .bestSell(bookOptional.get().isBestSell())
                             .newArrival(bookOptional.get().isNewArrival())
                             .ofTheWeek(bookOptional.get().isOfTheWeek())

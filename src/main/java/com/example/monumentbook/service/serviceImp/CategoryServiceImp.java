@@ -194,7 +194,7 @@ public class CategoryServiceImp implements CategoryService {
         List<BookCategory> bookCategoryList = bookCategoryRepository.findAllByCategory(category);
         List<BookDto> authorBooks = new ArrayList<>();
         for(BookCategory bookCategory : bookCategoryList){
-            Optional<Book> bookOptional = bookRepository.findById(bookCategory.getBook().getId());
+            Optional<Book> bookOptional = bookRepository.findByIdAndDeletedFalse(bookCategory.getBook().getId());
             if(bookOptional.isPresent()){
                 BookDto book = BookDto.builder()
                         .id(bookOptional.get().getId())

@@ -6,7 +6,6 @@ import java.util.zip.Inflater;
 
 public class ImageUtils {
 
-
     public static byte[] compressImage(byte[] data) {
         Deflater deflater = new Deflater();
         deflater.setLevel(Deflater.BEST_COMPRESSION);

@@ -13,12 +13,13 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends JpaRepository<Book,Integer> {
 
-    Book getByIsbn(String isbn);
-    Optional<Book> findBookByTitle(String string);
-    Page<Book> findByDeleteFalse(Pageable pageable);
-    Page<Book> findByDeleteFalseAndOfTheWeekTrue(Pageable pageable);
-    Page<Book> findByDeleteFalseAndBestSellTrue(Pageable pageable);
-    Page<Book> findByDeleteFalseAndNewArrivalTrue(Pageable pageable);
-//    List<Book> findByDeleteFalseAndTitleOrDescriptionOrIsbn(String string);
+//    Book getByIsbn(String isbn);
+//    Optional<Book> findBookByTitle(String string);
+    Page<Book> findByDeletedFalse(Pageable pageable);
+    Page<Book> findByDeletedFalseAndOfTheWeekTrue(Pageable pageable);
+    Page<Book> findByDeletedFalseAndBestSellTrue(Pageable pageable);
+    Page<Book> findByDeletedFalseAndNewArrivalTrue(Pageable pageable);
+
+    Optional<Book> findByIdAndDeletedFalse(Integer id);
 
 }

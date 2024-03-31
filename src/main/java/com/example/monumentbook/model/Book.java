@@ -30,8 +30,8 @@ public class Book {
     private LocalDate publishDate;
     private int qty;
     private float price;
-    @Column(name = "is_delete")
-    private boolean delete;
+    @Column(name = "deleted")
+    private boolean deleted;
     @Column(name = "of_the_week")
     private boolean ofTheWeek;
     @Column(name = "best_sell")

@@ -298,7 +298,7 @@ public class AuthorServiceImp implements AuthorService {
         List<AuthorBook> authorBookList = authorBookRepository.findAllByAuthors(author);
         List<BookDto> authorBooks = new ArrayList<>();
         for(AuthorBook authorBook : authorBookList){
-            Optional<Book> bookOptional = bookRepository.findById(authorBook.getBook().getId());
+            Optional<Book> bookOptional = bookRepository.findByIdAndDeletedFalse(authorBook.getBook().getId());
             if(bookOptional.isPresent()){
                 BookDto book = BookDto.builder()
                         .id(bookOptional.get().getId())
