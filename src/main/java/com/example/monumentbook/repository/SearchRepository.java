@@ -22,24 +22,25 @@ public interface SearchRepository extends JpaRepository<Book, Integer> {
             "\tc.name\n" +
             "\t\n" +
             "from\n" +
-            "\t`_book` b\n" +
-            "inner join `_category_book` cb on\n" +
+            "\t`book_tb` b\n" +
+            "inner join `category_book_tb` cb on\n" +
             "\tcb.book_id = b.id\n" +
-            "inner join author_book ab on\n" +
+            "inner join author_book_tb ab on\n" +
             "\tab.book_id = b.id \n" +
-            "inner join authors a on\n" +
+            "inner join `authors_tb` a on\n" +
             "\ta.author_id = ab.authors_id \n" +
-            "inner join `_category` c on\n" +
+            "inner join `category_tb` c on\n" +
             "\tc.id = cb.category_id \n" +
             "\t\n" +
-            "where \n" +
-            "\tb.title like %:filter%\n" +
-            "\t\n" +
-            "\tor \n" +
+            "where \n"+
+            "\t(b.title like %:filter%\n" +
+            "\tor\n" +
             "\tc.name like %:filter%\n" +
-            "\tor \n" +
+            "\tor\n" +
             "\tb.isbn like %:filter%\n" +
-            "\tor \n" +
-            "\ta.name like %:filter%", nativeQuery = true)
+            "\tor\n" +
+            "\ta.name like %:filter%)\n" +
+            "\tand\n" +
+            "\tb.deleted = false", nativeQuery = true)
     List<?> searchAll(String filter);
 }
