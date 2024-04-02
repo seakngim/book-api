@@ -109,12 +109,12 @@ public class UserServiceImpl implements UserService {
             if (userOptional.isPresent()) {
                 User user = User.builder()
                         .id(userOptional.get().getId())
-                        .email(userOptional.get().getEmail())
-                        .phoneNumber(userOptional.get().getPhoneNumber())
-                        .username(userOptional.get().getUsername())
+                        .email(userRequest.getEmail())
+                        .phoneNumber(userRequest.getPhoneNumber())
+                        .username(userRequest.getUsername())
                         .role(userOptional.get().getRole())
-                        .coverImg(userOptional.get().getCoverImg())
-                        .address(userOptional.get().getAddress())
+                        .coverImg(userRequest.getCoverImg())
+                        .address(userRequest.getAddress())
                         .build();
                 userRepository.save(user);
                     UserResponse userResponse = UserResponse.builder()
