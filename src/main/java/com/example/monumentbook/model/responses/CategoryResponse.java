@@ -18,7 +18,8 @@ public class CategoryResponse {
     private String name;
     private String description;
     private String coverImage;
-    private LocalDate date;@JsonInclude(JsonInclude.Include.NON_NULL)
+    private LocalDate date;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<BookDto> books;
 
 
