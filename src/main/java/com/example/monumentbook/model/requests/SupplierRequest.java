@@ -11,7 +11,8 @@ import lombok.Setter;
 @Builder
 public class SupplierRequest {
     private String name;
-    private String description;
+    private String phone;
+    private String email;
     private String image;
     private String address;
 }

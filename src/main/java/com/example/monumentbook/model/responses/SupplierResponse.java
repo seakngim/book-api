@@ -15,7 +15,8 @@ import java.util.List;
 public class SupplierResponse {
     private Integer id;
     private String name;
-    private String description;
+    private String phone;
+    private String email;
     private String image;
     private LocalDate date;
     private String address;

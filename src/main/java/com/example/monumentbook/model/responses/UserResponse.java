@@ -1,9 +1,9 @@
 package com.example.monumentbook.model.responses;
 
 import com.example.monumentbook.enums.Role;
+import com.example.monumentbook.model.dto.CreditCardDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,5 +16,6 @@ public class UserResponse {
     private String email;
     private String coverImg;
     private String address;
+    private CreditCardDto creditCard;
     private Role role;
 }

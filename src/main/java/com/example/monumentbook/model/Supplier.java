@@ -19,11 +19,11 @@ public class Supplier {
     @Column(name = "author_id")
     private Integer id;
     private String name;
-    @Column(length = 1000)
-    private String description;
     private String image;
     private LocalDate date;
     private String address;
+    private String phone;
+    private String email;
     @Column(name = "deleted")
     private boolean deleted = false;
 }

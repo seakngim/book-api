@@ -30,7 +30,8 @@ public class SupplierServiceImpl implements SupplierService {
         Supplier supplierResponse = Supplier.builder()
                 .name(supplierRequest.getName())
                 .image(supplierRequest.getImage())
-                .description(supplierRequest.getDescription())
+                .phone(supplierRequest.getPhone())
+                .email(supplierRequest.getEmail())
                 .address(supplierRequest.getAddress())
                 .date(LocalDate.now())
                 .build();
@@ -52,7 +53,6 @@ public class SupplierServiceImpl implements SupplierService {
                     SupplierResponse supplierResponse = supplierResponse(supplierOptional.get());
                     supplierResponses.add(supplierResponse);
                 }
-
             }
             ResponseObject res = new ResponseObject();
             res.setMessage("All suppliers fetched successfully");
@@ -101,7 +101,8 @@ public class SupplierServiceImpl implements SupplierService {
                        .id(supplierOptional.get().getId())
                        .name(supplierRequest.getName())
                        .image(supplierRequest.getImage())
-                       .description(supplierRequest.getDescription())
+                       .phone(supplierRequest.getPhone())
+                       .email(supplierRequest.getEmail())
                        .address(supplierRequest.getAddress())
                        .date(supplierOptional.get().getDate())
                        .build();
@@ -131,7 +132,8 @@ public class SupplierServiceImpl implements SupplierService {
                         .id(supplierOptional.get().getId())
                         .name(supplierOptional.get().getName())
                         .image(supplierOptional.get().getImage())
-                        .description(supplierOptional.get().getDescription())
+                        .phone(supplierOptional.get().getPhone())
+                        .email(supplierOptional.get().getEmail())
                         .address(supplierOptional.get().getAddress())
                         .date(supplierOptional.get().getDate())
                         .deleted(true)
@@ -159,7 +161,8 @@ public class SupplierServiceImpl implements SupplierService {
                 .id(supplier.getId())
                 .name(supplier.getName())
                 .image(supplier.getImage())
-                .description(supplier.getDescription())
+                .phone(supplier.getPhone())
+                .email(supplier.getEmail())
                 .address(supplier.getAddress())
                 .books(books)
                 .date(LocalDate.now())

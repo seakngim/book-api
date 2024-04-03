@@ -1,8 +1,11 @@
 package com.example.monumentbook.service.serviceImp;
 
+import com.example.monumentbook.model.CreditCard;
 import com.example.monumentbook.model.User;
+import com.example.monumentbook.model.dto.CreditCardDto;
 import com.example.monumentbook.model.requests.UserRequest;
 import com.example.monumentbook.model.responses.UserResponse;
+import com.example.monumentbook.repository.CreditCardRepository;
 import com.example.monumentbook.repository.UserRepository;
 import com.example.monumentbook.service.UserService;
 import com.example.monumentbook.utilities.response.EmptyObject;
@@ -10,7 +13,6 @@ import com.example.monumentbook.utilities.response.Message;
 import com.example.monumentbook.utilities.response.ResponseObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final CreditCardRepository creditCardRepository;
     ResponseObject res = new ResponseObject();
     Message message = new Message();
     EmptyObject emptyObject = new EmptyObject();
@@ -62,7 +65,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> findCurrentUser() {
-
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User currentUser = (User) authentication.getPrincipal();
@@ -146,7 +148,22 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserResponse userResponse(Optional<User> userOptional) {
-        return UserResponse.builder()
+        Optional<CreditCard> creditCard = creditCardRepository.findByUserId(userOptional.get().getId());
+        System.out.println(creditCard+"creditCard");
+        CreditCardDto creditCardDto= null;
+        if (creditCard.isPresent()){
+            creditCardDto = CreditCardDto.builder()
+                    .id(creditCard.get().getId())
+                    .cvv(creditCard.get().getCvv())
+                    .cardNumber(creditCard.get().getCardNumber())
+                    .fullName(creditCard.get().getFullName())
+                    .city(creditCard.get().getCity())
+                    .expiryMonth(creditCard.get().getExpiryMonth())
+                    .expiryYear(creditCard.get().getExpiryYear())
+                    .address(creditCardDto.getAddress())
+                    .build();
+        }
+        return   UserResponse.builder()
                 .id(userOptional.get().getId())
                 .email(userOptional.get().getEmail())
                 .phoneNum(userOptional.get().getPhoneNumber())
@@ -154,6 +171,7 @@ public class UserServiceImpl implements UserService {
                 .role(userOptional.get().getRole())
                 .coverImg(userOptional.get().getCoverImg())
                 .address(userOptional.get().getAddress())
+                .creditCard(creditCardDto)
                 .build();
     }
 

@@ -32,6 +32,10 @@ public class User implements UserDetails {
     private String email;
     private String address;
     private String password;
+//    @OneToOne (fetch = FetchType.LAZY )
+//    @JoinColumn(name = "creditCardId")
+//    private CreditCard creditCard;
+
     @Enumerated(EnumType.STRING)
     private Role role;
     @Override

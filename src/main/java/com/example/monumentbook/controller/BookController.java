@@ -49,12 +49,12 @@ public class BookController {
         return  bookService.DeleteById(id);
     }
 
-    @PostMapping("/add-productById")
+    @PostMapping("/addPurchase")
     @Operation(summary = "add product by Id")
     public ResponseEntity<?> addProductByName(@Param("book id") Integer id, @RequestBody ProductRequest productRequest){
       return bookService.addProductById(id,productRequest);
     }
-    @PostMapping("/out-product")
+    @PostMapping("/PurchaseCheckout")
     @Operation(summary = "sell book")
     private ResponseEntity<?> outProduct(@RequestBody List<CustomerRequest> customerRequest){
         return  bookService.outProductById(customerRequest);
@@ -105,22 +105,22 @@ public class BookController {
     public ResponseEntity<?> deleteNewArrival(@RequestBody RequestById bookIds){
         return bookService.deleteNewArrival(bookIds);
     }
-    @GetMapping("/getAllImport")
+    @GetMapping("/getAllPurchase")
     @Operation(summary = "get all vendor")
     public ResponseEntity<?> getAllImport(@RequestParam(defaultValue = "1") Integer page,@RequestParam(defaultValue = "10") Integer size){
         return bookService.getAllImportProduct(page, size);
     }
-    @DeleteMapping("/deleteImport")
+    @DeleteMapping("/deletePurchase")
     @Operation(summary = "delete import by vendor id")
     public ResponseEntity<?> deleteImport(@Param(value = "vendor id")Integer id){
         return bookService.deleteImport(id);
     }
-    @PutMapping("/updateImport")
+    @PutMapping("/updatePurchase")
     @Operation(summary = "update import by vendor id")
     public ResponseEntity<?> UpdateImport(@Param(value = "vendor id")Integer id,@Param(value = "vendor book_id")Integer book_id , @RequestBody ProductRequest productRequest ){
         return bookService.updateImport(id,book_id,productRequest);
     }
-    @GetMapping("/getImportById")
+    @GetMapping("/getPurchaseById")
     @Operation(summary = "get import vendor by id")
     public ResponseEntity<?> getImportById(@Param("import vendor id") Integer id){
         return bookService.getImportProductById(id);
