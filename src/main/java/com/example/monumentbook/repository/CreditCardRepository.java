@@ -6,9 +6,10 @@ import com.example.monumentbook.model.dto.CreditCardDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CreditCardRepository extends JpaRepository<CreditCard,Integer> {
-    Optional<CreditCard> findByUserId(long id);
+    List<CreditCard> findByUserId(long id);
 }

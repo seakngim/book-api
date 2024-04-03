@@ -49,7 +49,7 @@ public class SupplierServiceImpl implements SupplierService {
             List<SupplierResponse> supplierResponses = new ArrayList<>();
             for (Supplier supplier : suppliers){
                 Optional<Supplier> supplierOptional = supplierRepository.findById(supplier.getId());
-                if(supplierOptional.isPresent()){
+                if(supplierOptional.isPresent() && !supplierOptional.get().isDeleted()){
                     SupplierResponse supplierResponse = supplierResponse(supplierOptional.get());
                     supplierResponses.add(supplierResponse);
                 }

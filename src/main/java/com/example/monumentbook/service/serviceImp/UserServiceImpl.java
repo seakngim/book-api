@@ -148,21 +148,25 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserResponse userResponse(Optional<User> userOptional) {
-        Optional<CreditCard> creditCard = creditCardRepository.findByUserId(userOptional.get().getId());
-        System.out.println(creditCard+"creditCard");
-        CreditCardDto creditCardDto= null;
-        if (creditCard.isPresent()){
-            creditCardDto = CreditCardDto.builder()
-                    .id(creditCard.get().getId())
-                    .cvv(creditCard.get().getCvv())
-                    .cardNumber(creditCard.get().getCardNumber())
-                    .fullName(creditCard.get().getFullName())
-                    .city(creditCard.get().getCity())
-                    .expiryMonth(creditCard.get().getExpiryMonth())
-                    .expiryYear(creditCard.get().getExpiryYear())
-                    .address(creditCardDto.getAddress())
-                    .build();
+        List<CreditCard> creditCards = creditCardRepository.findByUserId(userOptional.get().getId());
+        List<CreditCardDto> creditCardList = new ArrayList<>();
+        for(CreditCard creditCard : creditCards){
+            Optional<CreditCard> creditCardOptional = creditCardRepository.findById(creditCard.getId());
+            if (creditCardOptional.isPresent()){
+                CreditCardDto creditCardDto = CreditCardDto.builder()
+                        .id(creditCardOptional.get().getId())
+                        .cvv(creditCardOptional.get().getCvv())
+                        .cardNumber(creditCardOptional.get().getCardNumber())
+                        .fullName(creditCardOptional.get().getFullName())
+                        .city(creditCardOptional.get().getCity())
+                        .expiryMonth(creditCardOptional.get().getExpiryMonth())
+                        .expiryYear(creditCardOptional.get().getExpiryYear())
+                        .address(creditCardOptional.get().getAddress())
+                        .build();
+                creditCardList.add(creditCardDto);
+            }
         }
+
         return   UserResponse.builder()
                 .id(userOptional.get().getId())
                 .email(userOptional.get().getEmail())
@@ -171,7 +175,7 @@ public class UserServiceImpl implements UserService {
                 .role(userOptional.get().getRole())
                 .coverImg(userOptional.get().getCoverImg())
                 .address(userOptional.get().getAddress())
-                .creditCard(creditCardDto)
+                .creditCard(creditCardList)
                 .build();
     }
 

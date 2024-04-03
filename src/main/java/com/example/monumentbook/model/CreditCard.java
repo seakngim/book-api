@@ -31,7 +31,7 @@ public class CreditCard {
     private String address;
     private String city;
     private LocalDate date;
-    @OneToOne (fetch = FetchType.LAZY )
+    @ManyToOne (fetch = FetchType.LAZY )
     @JoinColumn(name = "userId")
     private User user;
 

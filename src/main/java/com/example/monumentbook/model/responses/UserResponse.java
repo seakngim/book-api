@@ -5,6 +5,8 @@ import com.example.monumentbook.model.dto.CreditCardDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,6 +18,6 @@ public class UserResponse {
     private String email;
     private String coverImg;
     private String address;
-    private CreditCardDto creditCard;
+    private List<CreditCardDto> creditCard;
     private Role role;
 }

@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -32,9 +33,9 @@ public class User implements UserDetails {
     private String email;
     private String address;
     private String password;
-//    @OneToOne (fetch = FetchType.LAZY )
-//    @JoinColumn(name = "creditCardId")
-//    private CreditCard creditCard;
+    @OneToMany (fetch = FetchType.LAZY )
+    @JoinColumn(name = "creditCardId")
+    private List<CreditCard> creditCard;
 
     @Enumerated(EnumType.STRING)
     private Role role;
