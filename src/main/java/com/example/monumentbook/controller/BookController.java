@@ -51,13 +51,13 @@ public class BookController {
 
     @PostMapping("/addPurchase")
     @Operation(summary = "add product by Id")
-    public ResponseEntity<?> addProductByName(@Param("book id") Integer id, @RequestBody ProductRequest productRequest){
-      return bookService.addProductById(id,productRequest);
+    public ResponseEntity<?> addProductByName(@RequestBody ProductRequest productRequest){
+      return bookService.purchaseById(productRequest);
     }
     @PostMapping("/PurchaseCheckout")
     @Operation(summary = "sell book")
-    private ResponseEntity<?> outProduct(@RequestBody List<CustomerRequest> customerRequest){
-        return  bookService.outProductById(customerRequest);
+    private ResponseEntity<?> processCheckout(@RequestBody List<CustomerRequest> customerRequest){
+        return  bookService.processCheckoutById(customerRequest);
     }
 
     @GetMapping("/get-book-of-the-week")
@@ -107,23 +107,23 @@ public class BookController {
     }
     @GetMapping("/getAllPurchase")
     @Operation(summary = "get all vendor")
-    public ResponseEntity<?> getAllImport(@RequestParam(defaultValue = "1") Integer page,@RequestParam(defaultValue = "10") Integer size){
-        return bookService.getAllImportProduct(page, size);
+    public ResponseEntity<?> getAllImport(){
+        return bookService.getAllPurchase();
     }
     @DeleteMapping("/deletePurchase")
     @Operation(summary = "delete import by vendor id")
     public ResponseEntity<?> deleteImport(@Param(value = "vendor id")Integer id){
-        return bookService.deleteImport(id);
+        return bookService.deletePurchase(id);
     }
     @PutMapping("/updatePurchase")
     @Operation(summary = "update import by vendor id")
-    public ResponseEntity<?> UpdateImport(@Param(value = "vendor id")Integer id,@Param(value = "vendor book_id")Integer book_id , @RequestBody ProductRequest productRequest ){
-        return bookService.updateImport(id,book_id,productRequest);
+    public ResponseEntity<?> UpdateImport(@Param(value = "vendor id")Integer id, @RequestBody ProductRequest productRequest ){
+        return bookService.updatePurchase(id,productRequest);
     }
     @GetMapping("/getPurchaseById")
     @Operation(summary = "get import vendor by id")
     public ResponseEntity<?> getImportById(@Param("import vendor id") Integer id){
-        return bookService.getImportProductById(id);
+        return bookService.getPurchaseById(id);
     }
 
 }

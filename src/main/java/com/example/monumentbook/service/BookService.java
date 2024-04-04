@@ -15,8 +15,6 @@ public interface BookService {
     ResponseEntity<?> saveBook(BookRequest book);
     ResponseEntity<?> updateBook(BookRequest book, Integer id);
     ResponseEntity<?> DeleteById(Integer id);
-    ResponseEntity<?> addProductById(Integer id, ProductRequest productRequest);
-    ResponseEntity<?> outProductById(List<CustomerRequest> customerRequest);
     ResponseEntity<?> getBookOfTheWeek(Integer page, Integer size);
     ResponseEntity<?> getBestSell(Integer page, Integer size);
     ResponseEntity<?> getNewArrival(Integer page, Integer size);
@@ -26,9 +24,10 @@ public interface BookService {
     ResponseEntity<?> deleteBookOfTheWeek(RequestById requestById);
     ResponseEntity<?> deleteBestSell(RequestById requestById);
     ResponseEntity<?> deleteNewArrival(RequestById requestById);
-    ResponseEntity<?> getAllImportProduct(Integer page, Integer size);
-    ResponseEntity<?> deleteImport(Integer id);
-    ResponseEntity<?> updateImport(Integer id,Integer book_id,ProductRequest productRequest);
-    ResponseEntity<?> getImportProductById(Integer id);
-//    ResponseEntity<?> findBookBySearch(String keySearch);
+    ResponseEntity<?> getAllPurchase();
+    ResponseEntity<?> deletePurchase(Integer id);
+    ResponseEntity<?> processCheckoutById(List<CustomerRequest> customerRequest);
+    ResponseEntity<?> updatePurchase(Integer id,ProductRequest productRequest);
+    ResponseEntity<?> purchaseById(ProductRequest productRequest);
+    ResponseEntity<?> getPurchaseById(Integer id);
 }

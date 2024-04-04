@@ -10,11 +10,13 @@ import com.example.monumentbook.model.requests.ProductRequest;
 import com.example.monumentbook.model.requests.RequestById;
 import com.example.monumentbook.model.responses.ApiResponse;
 import com.example.monumentbook.model.responses.BookResponse;
+import com.example.monumentbook.model.responses.ProductResponse;
 import com.example.monumentbook.model.responses.VendorResponse;
 import com.example.monumentbook.repository.*;
 import com.example.monumentbook.service.BookService;
 import com.example.monumentbook.utilities.response.ResponseObject;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,29 +34,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class BookServiceImp implements BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
     private final AuthorBookRepository authorBookRepository;
     private final BookCategoryRepository bookCategoryRepository;
-    private final VendorRepository vendorRepository;
+    private final SupplierRepository supplierRepository;
+    private final ProductRepository productRepository;
     private final OrderRepository customerRepository;
     private final CartRepository cartRepository;
 
     ResponseObject res = new ResponseObject();
 
-    public BookServiceImp(BookRepository bookRepository, AuthorRepository authorRepository, CategoryRepository categoryRepository, AuthorBookRepository authorBookRepository, BookCategoryRepository bookCategoryRepository, VendorRepository vendorRepository, OrderRepository customerRepository, CartRepository cartRepository) {
-
-        this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository;
-        this.categoryRepository = categoryRepository;
-        this.authorBookRepository = authorBookRepository;
-        this.bookCategoryRepository = bookCategoryRepository;
-        this.vendorRepository = vendorRepository;
-        this.customerRepository = customerRepository;
-        this.cartRepository = cartRepository;
-    }
 
     @Override
     public ResponseEntity<?> findAllBook(Integer page, Integer size) {
@@ -411,10 +404,10 @@ public class BookServiceImp implements BookService {
     }
     @Override
     @Transactional
-    public ResponseEntity<?> addProductById(Integer id, ProductRequest productRequest) {
+    public ResponseEntity<?> purchaseById(ProductRequest productRequest) {
 
         try {
-            Optional<Book> bookOptional = bookRepository.findById(id);
+            Optional<Book> bookOptional = bookRepository.findById(productRequest.getBook());
             if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
                 Book book = Book.builder()
                         .id(bookOptional.get().getId())
@@ -432,17 +425,23 @@ public class BookServiceImp implements BookService {
                         .ofTheWeek(bookOptional.get().isOfTheWeek())
                         .build();
                 bookRepository.save(book);
-                Vendor vendor = Vendor.builder()
-                        .cost(productRequest.getCost())
-                        .name(productRequest.getVendor())
-                        .qty(productRequest.getQty())
-                        .date(LocalDate.now())
-                        .book_id(bookOptional.get().getId())
-                        .build();
-                vendorRepository.save(vendor);
-                res.setStatus(true);
-                res.setMessage("add success!");
-                res.setData(vendor);
+                Optional<Supplier> supplierOptional = supplierRepository.findById(productRequest.getSupplier());
+
+                if (supplierOptional.isPresent()) {
+                    Product product = Product.builder()
+                            .tax(productRequest.getTax())
+                            .invoice(productRequest.getInvoice())
+                            .cost(productRequest.getCost())
+                            .qty(productRequest.getQty())
+                            .book(bookOptional.get())
+                            .date(LocalDate.now())
+                            .supplier(supplierOptional.get())
+                            .build();
+                    productRepository.save(product);
+                    res.setStatus(true);
+                    res.setMessage("add success!");
+                    res.setData(product);
+                }
                 return ResponseEntity.ok(res);
             } else {
                 res.setStatus(false);
@@ -456,7 +455,7 @@ public class BookServiceImp implements BookService {
     }
 
     @Override
-    public ResponseEntity<?> outProductById(List<CustomerRequest> customerRequests) {
+    public ResponseEntity<?> processCheckoutById(List<CustomerRequest> customerRequests) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser;
         if (authentication.getPrincipal() instanceof User) {
@@ -668,212 +667,140 @@ public class BookServiceImp implements BookService {
     }
 
     @Override
-    public ResponseEntity<?> getAllImportProduct(Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-        Page<Vendor> pageResult = vendorRepository.findByDeletedFalse(pageable);
-        List<VendorResponse> vendorList = new ArrayList<>();
-        for(Vendor vendor : pageResult){
-            Optional<Vendor> vendorOptional = vendorRepository.findById(vendor.getId());
-            if (vendorOptional.isPresent()){
-                Optional<Book> bookOptional = bookRepository.findById(vendorOptional.get().getBook_id());
-                if (bookOptional.isPresent()){
-                    BookDto bookDto = BookDto.builder()
-                            .id(bookOptional.get().getId())
-                            .qty(bookOptional.get().getQty())
-                            .description(bookOptional.get().getDescription())
-                            .price(bookOptional.get().getPrice())
-                            .coverImg(bookOptional.get().getCoverImg())
-                            .isbn(bookOptional.get().getIsbn())
-                            .title(bookOptional.get().getTitle())
-                            .build();
-                    VendorResponse vendorResponse = VendorResponse.builder()
-                            .id(vendorOptional.get().getId())
-                            .cost(vendorOptional.get().getCost())
-                            .qty(vendorOptional.get().getQty())
-                            .name(vendorOptional.get().getName())
-                            .date(vendorOptional.get().getDate())
-                            .book(bookDto)
-                            .build();
-                    vendorList.add(vendorResponse);
-                }
-
-
-            }
-
-        }
-        ApiResponse res = new ApiResponse(true, "Fetch books successful!", vendorList, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getContent().size());
-        return ResponseEntity.ok(res);
-    }
-
-    @Override
-    public ResponseEntity<?> deleteImport(Integer id) {
+    public ResponseEntity<?> getAllPurchase() {
         try {
-            Optional<Vendor> vendor = vendorRepository.findByIdAndDeletedFalse(id);
-            System.out.println(vendor);
-            if (vendor.isPresent()) {
-                Optional<Book> bookOptional = bookRepository.findById(vendor.get().getBook_id());
-                if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
-                    Book book = Book.builder()
-                            .id(bookOptional.get().getId())
-                            .isbn(bookOptional.get().getIsbn())
-                            .title(bookOptional.get().getTitle())
-                            .description(bookOptional.get().getDescription())
-                            .coverImg(bookOptional.get().getCoverImg())
-                            .publisher(bookOptional.get().getPublisher())
-                            .publishDate(bookOptional.get().getPublishDate())
-                            .price(bookOptional.get().getPrice())
-                            .qty(bookOptional.get().getQty() - vendor.get().getQty())
-                            .deleted(bookOptional.get().isDeleted())
-                            .bestSell(bookOptional.get().isBestSell())
-                            .newArrival(bookOptional.get().isNewArrival())
-                            .ofTheWeek(bookOptional.get().isOfTheWeek())
-                            .build();
-                    bookRepository.save(book);
-                    Vendor vendorObj = Vendor.builder()
-                            .id(vendor.get().getId())
-                            .cost(vendor.get().getCost())
-                            .name(vendor.get().getName())
-                            .qty(vendor.get().getQty())
-                            .date(LocalDate.now())
-                            .book_id(vendor.get().getBook_id())
-                            .deleted(true)
-                            .build();
-                    vendorRepository.save(vendorObj);
-                    res.setStatus(true);
-                    res.setMessage("add success!");
-                    res.setData(vendor);
-                    return ResponseEntity.ok(res);
-                } else {
-                    res.setStatus(false);
-                    res.setMessage("add false!");
-                    res.setData(null);
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+            List<Product> products = productRepository.findAll();
+            List<ProductResponse> productResponses = new ArrayList<>();
+            for(Product product : products){
+                Optional<Product> productOptional = productRepository.findById(product.getId());
+                if (productOptional.isPresent()){
+                    ProductResponse productResponse = createProductResponse(product);
+                    productResponses.add(productResponse);
                 }
-            }
+                ResponseObject res = new  ResponseObject();
+                res.setMessage("fetch all purchase found");
+                res.setStatus(true);
+                res.setData(productResponses);
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id not found");
-
-    }
-
-    @Override
-    public ResponseEntity<?> updateImport(Integer id,Integer book_id, ProductRequest productRequest) {
-        try {
-            Optional<Vendor> vendor = vendorRepository.findByIdAndDeletedFalse(id);
-            System.out.println(vendor);
-            if (vendor.isPresent()) {
-                Optional<Book> bookOptional = bookRepository.findById(book_id);
-                if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
-                    Book book = Book.builder()
-                            .id(bookOptional.get().getId())
-                            .isbn(bookOptional.get().getIsbn())
-                            .title(bookOptional.get().getTitle())
-                            .description(bookOptional.get().getDescription())
-                            .coverImg(bookOptional.get().getCoverImg())
-                            .publisher(bookOptional.get().getPublisher())
-                            .publishDate(bookOptional.get().getPublishDate())
-                            .price(bookOptional.get().getPrice())
-                            .qty(bookOptional.get().getQty() - vendor.get().getQty() +productRequest.getQty())
-                            .deleted(bookOptional.get().isDeleted())
-                            .bestSell(bookOptional.get().isBestSell())
-                            .newArrival(bookOptional.get().isNewArrival())
-                            .ofTheWeek(bookOptional.get().isOfTheWeek())
-                            .build();
-                    bookRepository.save(book);
-                    Vendor vendorObj = Vendor.builder()
-                            .id(vendor.get().getId())
-                            .cost(productRequest.getCost())
-                            .name(productRequest.getVendor())
-                            .qty(productRequest.getQty())
-                            .date(vendor.get().getDate())
-                            .book_id(bookOptional.get().getId())
-                            .build();
-                    vendorRepository.save(vendorObj);
-                    res.setStatus(true);
-                    res.setMessage("add success!");
-                    res.setData(vendor);
-                    return ResponseEntity.ok(res);
-                } else {
-                    res.setStatus(false);
-                    res.setMessage("add false!");
-                    res.setData(null);
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
-                }
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id not found");
-    }
-
-    @Override
-    public ResponseEntity<?> getImportProductById(Integer id) {
-        try {
-            Optional<Vendor> vendorOptional = vendorRepository.findById(id);
-            if (vendorOptional.isPresent()){
-                Optional<Book> bookOptional = bookRepository.findById(vendorOptional.get().getBook_id());
-                if (bookOptional.isPresent()) {
-                    BookDto bookDto = BookDto.builder()
-                            .id(bookOptional.get().getId())
-                            .qty(bookOptional.get().getQty())
-                            .description(bookOptional.get().getDescription())
-                            .price(bookOptional.get().getPrice())
-                            .coverImg(bookOptional.get().getCoverImg())
-                            .isbn(bookOptional.get().getIsbn())
-                            .title(bookOptional.get().getTitle())
-                            .build();
-                    VendorResponse vendorResponse = VendorResponse.builder()
-                            .id(vendorOptional.get().getId())
-                            .cost(vendorOptional.get().getCost())
-                            .qty(vendorOptional.get().getQty())
-                            .name(vendorOptional.get().getName())
-                            .date(vendorOptional.get().getDate())
-                            .book(bookDto)
-                            .build();
-                    res.setData(vendorResponse);
-                    res.setStatus(true);
-                    res.setMessage("get import by id successful!");
-                }
             }
             return ResponseEntity.ok(res);
         }catch (Exception e){
-            res.setData(null);
+            ResponseObject res = new  ResponseObject();
+            res.setMessage("fetch all purchase found");
             res.setStatus(false);
-            res.setMessage("get import by id false!");
-            return ResponseEntity.ok(res);
+            res.setData(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
         }
     }
 
-//    @Override
-//    public ResponseEntity<?> findBookBySearch(String keySearch) {
-//        try {
-////            Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
-////            Page<BookDto> pageResult = bookRepository.findByDeleteFalseAndNewArrivalTrue(pageable).map(Book::toDto);
-//            List<Book> books = bookRepository.findByDeleteFalseAndTitleOrDescriptionOrIsbn(keySearch);
-//            List<BookResponse> bookObj = new ArrayList<>();
-//            for (Book book : books) {
-//                Optional<Book> bookOptional = bookRepository.findById(book.getId());
-//                if (bookOptional.isPresent()) {
-//                    List<CategoryDto> categoryObj = getCategoriesByBookId(bookOptional.get());
-//                    List<AuthorDto> authorObj = getAuthorsByBookId(bookOptional.get());
-//
-//                    BookResponse bookResponse = createBookResponse(bookOptional.get(), categoryObj, authorObj);
-//                    bookObj.add(bookResponse);
-//                }
-//            }
-//            if (!bookObj.isEmpty()) {
-//                ApiResponse res = new ApiResponse(true, "Fetch books successful!", bookObj, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), bookObj.size());
-//                return ResponseEntity.ok(res);
-//            } else {
-//                ApiResponse res = new ApiResponse(false, "No books found!", null, pageResult.getNumber() + 1, pageResult.getSize(), pageResult.getTotalPages(), pageResult.getTotalElements());
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
-//            }
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//        }
-//    }
+    @Override
+    public ResponseEntity<?> deletePurchase(Integer id) {
+        try {
+            Optional<Product> productOptional = productRepository.findById(id);
+            if (productOptional.isPresent()){
+                productRepository.delete(productOptional.get());
+                res.setMessage("delete purchase found");
+                res.setStatus(true);
+                res.setData(null);
+            }
+            return ResponseEntity.ok(res);
+
+        } catch (Exception e) {
+            ResponseObject res = new  ResponseObject();
+            res.setMessage("delete purchase not found");
+            res.setStatus(false);
+            res.setData(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+        }
+    }
+    @Override
+    public ResponseEntity<?> updatePurchase(Integer id, ProductRequest productRequest) {
+        try {
+            try {
+                Optional<Product> productOptional = productRepository.findById(id);
+                if (productOptional.isPresent()) {
+                    Optional<Book> bookOptional = bookRepository.findById(productRequest.getBook());
+                    if (bookOptional.isPresent() && !bookOptional.get().isDeleted()) {
+                        Book book = Book.builder()
+                                .id(bookOptional.get().getId())
+                                .isbn(bookOptional.get().getIsbn())
+                                .title(bookOptional.get().getTitle())
+                                .description(bookOptional.get().getDescription())
+                                .coverImg(bookOptional.get().getCoverImg())
+                                .publisher(bookOptional.get().getPublisher())
+                                .publishDate(bookOptional.get().getPublishDate())
+                                .price(bookOptional.get().getPrice())
+                                .qty(bookOptional.get().getQty() + productRequest.getQty()- productOptional.get().getQty())
+                                .deleted(bookOptional.get().isDeleted())
+                                .bestSell(bookOptional.get().isBestSell())
+                                .newArrival(bookOptional.get().isNewArrival())
+                                .ofTheWeek(bookOptional.get().isOfTheWeek())
+                                .build();
+                        bookRepository.save(book);
+                        Optional<Supplier> supplierOptional = supplierRepository.findById(productRequest.getSupplier());
+                        if (supplierOptional.isPresent()) {
+                            Product product = Product.builder()
+                                    .id(productOptional.get().getId())
+                                    .tax(productRequest.getTax())
+                                    .invoice(productRequest.getInvoice())
+                                    .cost(productRequest.getCost())
+                                    .qty(productRequest.getQty())
+                                    .book(bookOptional.get())
+                                    .date(LocalDate.now())
+                                    .supplier(supplierOptional.get())
+                                    .build();
+                            productRepository.save(product);
+                            res.setStatus(true);
+                            res.setMessage("add success!");
+                            res.setData(product);
+                             return ResponseEntity.ok(product);
+                        }
+
+                    } else {
+                        res.setStatus(false);
+                        res.setMessage("add false!");
+                        res.setData(null);
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+                    }
+                }
+
+            } catch (Exception e) {
+
+                res.setMessage("fetch all purchase found");
+                res.setStatus(true);
+                res.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id not found");
+    }
+
+    @Override
+    public ResponseEntity<?> getPurchaseById(Integer id) {
+        try {
+            ResponseObject res = new  ResponseObject();
+            Optional<Product> productOptional = productRepository.findById(id);
+            if (productOptional.isPresent()){
+                ProductResponse productResponse = createProductResponse(productOptional.get());
+                res.setMessage("fetch all purchase found");
+                res.setStatus(true);
+                res.setData(productResponse);
+            }
+            return ResponseEntity.ok(res);
+
+        } catch (Exception e) {
+            ResponseObject res = new  ResponseObject();
+            res.setMessage("fetch all purchase found");
+            res.setStatus(true);
+            res.setData(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+        }
+    }
+
 
     @Override
     public ResponseEntity<?> addBookOfTheWeek(RequestById requestById) {
@@ -944,6 +871,17 @@ public class BookServiceImp implements BookService {
                 .qty(book.getQty())
                 .author(authorObj)
                 .categories(categoryObj)
+                .build();
+    }
+    private ProductResponse createProductResponse(Product product){
+        return ProductResponse.builder()
+                .supplier(product.getSupplier().toDto())
+                .id(product.getId())
+                .invoice(product.getInvoice())
+                .tax(product.getTax())
+                .qty(product.getQty())
+                .date(product.getDate())
+                .book(product.getBook().toDto())
                 .build();
     }
 
