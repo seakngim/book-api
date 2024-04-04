@@ -1,11 +1,9 @@
 package com.example.monumentbook.model;
 
 import com.example.monumentbook.model.dto.CreditCardDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -14,6 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Builder
+@ToString(exclude = "user")
 @Table(name = "credit_card_tb")
 public class CreditCard {
     @Id
@@ -34,7 +33,6 @@ public class CreditCard {
     @ManyToOne (fetch = FetchType.LAZY )
     @JoinColumn(name = "userId")
     private User user;
-
     public CreditCardDto toDto(){
        return  new CreditCardDto(this.id,this.fullName,this.cardNumber,this.cvv, this.expiryMonth, this.expiryYear,this.address,this.city);
 

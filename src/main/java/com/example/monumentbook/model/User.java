@@ -3,10 +3,7 @@ package com.example.monumentbook.model;
 import com.example.monumentbook.enums.Role;
 import com.example.monumentbook.model.dto.UserDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,23 +17,25 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Builder
+@ToString(exclude = "creditCard")
 @Table(name = "user_tb")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-    private String username;
+
+    @Column(name = "name")
+    private String name;
     private String phoneNumber;
     private String coverImg;
     @Column(unique = true)
     private String email;
     private String address;
     private String password;
-    @OneToMany (fetch = FetchType.LAZY )
-    @JoinColumn(name = "creditCardId")
+    @OneToMany (mappedBy="user", fetch = FetchType.LAZY )
+//    @JoinColumn(name = "creditCardId")
     private List<CreditCard> creditCard;
-
     @Enumerated(EnumType.STRING)
     private Role role;
     @Override
@@ -51,7 +50,7 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         // email in our case
-        return email;
+        return email ;
     }
 
     @Override
@@ -74,6 +73,6 @@ public class User implements UserDetails {
         return true;
     }
     public UserDto toDto(){
-       return new UserDto(this.id,this.username,this.phoneNumber,this.email, this.coverImg);
+       return new UserDto(this.id,this.name,this.phoneNumber,this.email, this.coverImg);
     }
 }

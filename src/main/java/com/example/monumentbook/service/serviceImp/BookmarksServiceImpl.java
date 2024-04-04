@@ -171,7 +171,7 @@ public class BookmarksServiceImpl implements BookmarksService {
     private UserDto buildUserDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
-                .username(user.getUsername())
+                .name(user.getUsername())
                 .phoneNumber(user.getPhoneNumber())
                 .coverImage(user.getCoverImg())
                 .email(user.getEmail())

@@ -70,6 +70,7 @@ public class UserServiceImpl implements UserService {
             User currentUser = (User) authentication.getPrincipal();
 
             Optional<User> userOptional = userRepository.findById((int) currentUser.getId());
+            System.out.println(userOptional+"userOptional");
             if (userOptional.isPresent()) {
                 res.setData(userResponse(userOptional));
                 res.setMessage("fetch data success!");
@@ -113,7 +114,8 @@ public class UserServiceImpl implements UserService {
                         .id(userOptional.get().getId())
                         .email(userRequest.getEmail())
                         .phoneNumber(userRequest.getPhoneNumber())
-                        .username(userRequest.getUsername())
+                        .name(userRequest.getUsername())
+                        .password(userOptional.get().getPassword())
                         .role(userOptional.get().getRole())
                         .coverImg(userRequest.getCoverImg())
                         .address(userRequest.getAddress())
@@ -171,7 +173,7 @@ public class UserServiceImpl implements UserService {
                 .id(userOptional.get().getId())
                 .email(userOptional.get().getEmail())
                 .phoneNum(userOptional.get().getPhoneNumber())
-                .username(userOptional.get().getUsername())
+                .username(userOptional.get().getName())
                 .role(userOptional.get().getRole())
                 .coverImg(userOptional.get().getCoverImg())
                 .address(userOptional.get().getAddress())

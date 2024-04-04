@@ -32,7 +32,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ResponseEntity<?> signup(SignUpRequest request) {
         try {
-        var user = User.builder().username(request.getUsername()).phoneNumber(request.getPhoneNumber())
+        var user = User.builder().name(request.getUsername()).phoneNumber(request.getPhoneNumber())
                 .email(request.getEmail()).password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.valueOf(request.getRole().toUpperCase())).build();
         userRepository.save(user);
