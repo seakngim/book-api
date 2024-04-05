@@ -12,7 +12,7 @@ spring:
 
     url: jdbc:mysql://localhost:3306/monument_book
     username: root
-    password: 1213@A*#
+    password: 12345!@#$%
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
